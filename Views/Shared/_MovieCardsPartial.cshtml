@@ -1,0 +1,58 @@
+﻿@model IEnumerable<CinemaManagement.Models.Movie>
+
+@foreach (var movie in Model)
+{
+    <article class="card card-interactive" role="listitem" aria-label="@movie.Title - @movie.Rating/10">
+        <div class="position-relative overflow-hidden">
+            <img src="@movie.PosterUrl" class="card-img-top" alt="" loading="lazy" />
+            @if (movie.MovieGenres != null && movie.MovieGenres.Any())
+            {
+                <div class="position-absolute top-0 start-0 p-2" style="z-index: 1;">
+                    <div class="d-flex flex-column gap-1">
+                        @foreach (var mg in movie.MovieGenres.Take(2))
+                        {
+                            <span class="badge badge-genre">@mg.Genre.Name</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="card-body text-center">
+            <h3 class="card-title">@movie.Title</h3>
+            <div class="d-flex flex-wrap justify-content-center gap-1" role="list" aria-label="Thể loại">
+                @if (movie.MovieGenres != null && movie.MovieGenres.Any())
+                {
+                    @foreach (var mg in movie.MovieGenres.Take(3))
+                    {
+                        <span class="badge badge-genre" role="listitem">@mg.Genre.Name</span>
+                    }
+                }
+                else
+                {
+                    <span class="badge" style="background: oklch(var(--state-error) / 0.15); color: var(--state-error); border: 1px solid oklch(var(--state-error) / 0.3);">Chưa có thể loại</span>
+                }
+            </div>
+            <div class="d-flex align-items-center justify-content-center gap-1" role="img" aria-label="Đánh giá @movie.Rating trên 10">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (movie.Rating >= i)
+                    {
+                        <i class="fas fa-star text-warning" aria-hidden="true"></i>
+                    }
+                    else if (movie.Rating >= i - 0.5)
+                    {
+                        <i class="fas fa-star-half-alt text-warning" aria-hidden="true"></i>
+                    }
+                    else
+                    {
+                        <i class="far fa-star text-warning" aria-hidden="true"></i>
+                    }
+                }
+                <span class="caption text-muted ms-1">(@movie.Rating.ToString("0.0"))</span>
+            </div>
+            <a href="@Url.Action("Details", "Movies", new { id = movie.MovieId })" class="btn btn-primary btn-pill w-100 mt-1" role="button">
+                <i class="fas fa-ticket-alt me-1" aria-hidden="true"></i> Xem chi tiết & đặt vé
+            </a>
+        </div>
+    </article>
+}

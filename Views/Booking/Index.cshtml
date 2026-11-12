@@ -1,0 +1,77 @@
+﻿@model CinemaManagement.ViewModel.BookingViewModel
+
+<div class="container-cinema section">
+    @if (Model?.Showtimes == null || !Model.Showtimes.Any())
+    {
+        <div class="alert alert-warning text-center">
+            🚨 Không tìm thấy suất chiếu nào cho phim này!
+        </div>
+    }
+    else
+    {
+        var firstShowtime = Model.Showtimes.FirstOrDefault();
+        var movie = firstShowtime?.Movie;
+
+        <div class="movie-grid" style="grid-template-columns: 1fr; gap: var(--gap-section);">
+            @if (movie != null)
+            {
+                <div class="card card-interactive" style="display: grid; grid-template-columns: 1fr; gap: var(--space-5);">
+                    <div class="card-img-top" style="height: 300px; object-fit: cover;">
+                        <img src="@movie.PosterUrl" alt="@movie.Title" class="w-100 h-100 object-fit-cover" />
+                    </div>
+                    <div class="card-body">
+                        <h2 class="display-3 fw-bold">🎬 @movie.Title</h2>
+                        <p class="text-muted mb-3">
+                            <strong>Thể loại:</strong>
+                            @if (movie.MovieGenres?.Any() == true)
+                            {
+                                foreach (var genre in movie.MovieGenres)
+                                {
+                                    <span class="badge badge-genre me-1">@genre.Genre.Name</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-danger">Chưa có thể loại</span>
+                            }
+                        </p>
+                        <p class="lead">@movie.Description</p>
+                    </div>
+                </div>
+            }
+
+            <div class="card card-interactive">
+                <div class="card-body">
+                    <h4 class="text-center mb-4 display-3">📅 Chọn suất chiếu</h4>
+                    <div class="movie-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                        @foreach (var showtime in Model.Showtimes)
+                        {
+                            <div class="card card-interactive h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="fw-bold">🏢 @showtime.Room.Theater.Name</h5>
+                                    <p class="fw-bold text-brand">⏰ @showtime.StartTime.ToString("dd/MM/yyyy HH:mm")</p>
+                                    <a asp-controller="Booking" asp-action="SelectSeats" asp-route-showtimeId="@showtime.ShowtimeId"
+                                       class="btn btn-success w-100 shadow-1">
+                                        🎟 Đặt vé ngay
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .card {
+        border-radius: var(--radius-lg);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+        box-shadow: var(--shadow-2);
+    }
+</style>

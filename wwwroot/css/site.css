@@ -1,0 +1,267 @@
+﻿/* ============================================================
+   Cinema Management — Legacy Compatibility Layer
+   This file maintains backward compatibility for any remaining
+   Bootstrap-dependent views during migration.
+   ============================================================ */
+
+/* Base HTML sizing */
+html { font-size: 14px; }
+@media (min-width: 768px) { html { font-size: 16px; } }
+
+/* Focus styles for Bootstrap components not yet migrated */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow: var(--shadow-focus);
+}
+
+/* Sticky footer fallback */
+html { position: relative; min-height: 100%; }
+body { margin-bottom: 60px; }
+
+/* Form floating labels */
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder { color: var(--text-muted); text-align: end; }
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder { text-align: start; }
+
+/* Login/Register links in navbar (legacy) */
+#login, #register { color: var(--text-primary) !important; }
+#login:hover, #register:hover { color: var(--action-primary) !important; }
+
+/* Card image hover (legacy _MovieCardsPartial) */
+.card img { transition: transform .3s ease; }
+.card:hover img { transform: scale(1.05); }
+
+/* Bootstrap dropdown overrides for design system compatibility */
+.dropdown-menu {
+  min-width: 230px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-3);
+  padding: var(--space-2) 0;
+  border: 1px solid var(--color-border-0);
+  background: var(--surface-elevated);
+}
+
+.dropdown-item {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-body-sm);
+  color: var(--text-primary);
+  background: transparent;
+  transition: background var(--duration-1) var(--ease-standard), color var(--duration-1) var(--ease-standard);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: var(--surface-hover);
+  color: var(--action-primary);
+}
+
+.dropdown-divider { border-color: var(--color-border-0); margin: var(--space-2) 0; }
+
+/* Navbar toggler */
+.navbar-toggler { border: none; padding: var(--space-1); }
+.navbar-toggler:focus { box-shadow: var(--shadow-focus); }
+.navbar-toggler-icon { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); }
+
+/* Modal overrides */
+.modal-content {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-0);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-3);
+}
+
+.modal-header { border-bottom: 1px solid var(--color-border-0); padding: var(--space-4) var(--space-5); }
+.modal-body { padding: var(--pad-modal); }
+.modal-footer { border-top: 1px solid var(--color-border-0); padding: var(--space-4) var(--space-5); }
+
+/* Toast */
+.toast { border-radius: var(--radius-md); box-shadow: var(--shadow-3); border: 1px solid var(--color-border-0); }
+.toast-header { border-bottom: 1px solid var(--color-border-0); background: var(--surface-elevated); }
+.toast-body { color: var(--text-primary); }
+
+/* Alert */
+.alert { border-radius: var(--radius-md); border: none; padding: var(--space-3) var(--space-4); }
+.alert-danger { background: oklch(var(--state-error) / 0.15); color: var(--state-error); border: 1px solid oklch(var(--state-error) / 0.3); }
+.alert-success { background: oklch(var(--state-success) / 0.15); color: var(--state-success); border: 1px solid oklch(var(--state-success) / 0.3); }
+.alert-warning { background: oklch(var(--state-warning) / 0.15); color: var(--state-warning); border: 1px solid oklch(var(--state-warning) / 0.3); }
+.alert-info { background: oklch(var(--state-info) / 0.15); color: var(--state-info); border: 1px solid oklch(var(--state-info) / 0.3); }
+
+/* Pagination */
+.pagination { gap: var(--space-1); }
+.page-link { border: 1px solid var(--color-border-0); color: var(--text-primary); background: var(--surface-elevated); border-radius: var(--radius-md); padding: var(--space-1) var(--space-3); }
+.page-link:hover { background: var(--surface-hover); border-color: var(--action-primary); color: var(--action-primary); }
+.page-item.active .page-link { background: var(--action-primary); border-color: var(--action-primary); color: var(--text-on-brand); }
+.page-item.disabled .page-link { color: var(--text-muted); background: var(--surface-hover); border-color: var(--color-border-0); }
+
+/* Table */
+.table { color: var(--text-primary); }
+.table th { font-weight: 600; color: var(--text-secondary); border-bottom: 2px solid var(--color-border-0); padding: var(--space-3) var(--space-4); }
+.table td { border-bottom: 1px solid var(--color-border-0); padding: var(--space-3) var(--space-4); }
+.table-striped > tbody > tr:nth-of-type(odd) > td { background: var(--surface-hover); }
+.table-hover > tbody > tr:hover > td { background: var(--surface-hover); }
+
+/* Badge */
+.badge { font-weight: 500; padding: var(--space-1) var(--space-2); border-radius: var(--radius-full); font-size: var(--text-caption); }
+.badge.bg-secondary { background: var(--surface-hover) !important; color: var(--text-primary) !important; border: 1px solid var(--color-border-0); }
+.badge.bg-danger { background: oklch(var(--state-error) / 0.15) !important; color: var(--state-error) !important; border: 1px solid oklch(var(--state-error) / 0.3); }
+.badge.bg-warning { background: oklch(var(--state-warning) / 0.15) !important; color: var(--state-warning) !important; border: 1px solid oklch(var(--state-warning) / 0.3); }
+.badge.bg-success { background: oklch(var(--state-success) / 0.15) !important; color: var(--state-success) !important; border: 1px solid oklch(var(--state-success) / 0.3); }
+.badge.bg-primary { background: oklch(var(--action-primary) / 0.15) !important; color: var(--action-primary) !important; border: 1px solid oklch(var(--action-primary) / 0.3); }
+
+/* Button overrides for Bootstrap buttons not yet migrated */
+.btn-outline-light { border-color: var(--color-border-1); color: var(--text-primary); }
+.btn-outline-light:hover { background: var(--action-primary); border-color: var(--action-primary); color: var(--text-on-brand); }
+.btn-outline-warning { border-color: var(--color-warning); color: var(--color-warning); }
+.btn-outline-warning:hover { background: var(--color-warning); color: var(--text-on-gold); }
+.btn-warning { background: var(--color-warning); border-color: var(--color-warning); color: var(--text-on-gold); }
+.btn-warning:hover { background: var(--color-warning-dim); border-color: var(--color-warning-dim); }
+.btn-danger { background: var(--state-error); border-color: var(--state-error); color: var(--text-on-brand); }
+.btn-danger:hover { background: oklch(0.48 0.24 25); border-color: oklch(0.48 0.24 25); }
+.btn-primary { background: var(--action-primary); border-color: var(--action-primary); color: var(--text-on-brand); }
+.btn-primary:hover { background: var(--action-primary-hover); border-color: var(--action-primary-hover); }
+.btn-secondary { background: var(--surface-hover); border-color: var(--color-border-1); color: var(--text-primary); }
+.btn-secondary:hover { background: var(--surface-hover); border-color: var(--color-border-1); }
+.btn-outline-danger { border-color: var(--state-error); color: var(--state-error); }
+.btn-outline-danger:hover { background: var(--state-error); color: var(--text-on-brand); }
+.btn-outline-primary { border-color: var(--action-primary); color: var(--action-primary); }
+.btn-outline-primary:hover { background: var(--action-primary); color: var(--text-on-brand); }
+
+/* Form control */
+.form-control, .form-select {
+  background: var(--surface-elevated);
+  border: 1px solid var(--color-border-0);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--focus-ring);
+  box-shadow: var(--shadow-focus);
+}
+.form-control::placeholder { color: var(--text-muted); }
+
+/* Card */
+.card { background: var(--surface-elevated); border: 1px solid var(--color-border-0); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); }
+.card-header { background: var(--surface-hover); border-bottom: 1px solid var(--color-border-0); padding: var(--space-3) var(--space-4); }
+.card-footer { background: var(--surface-hover); border-top: 1px solid var(--color-border-0); padding: var(--space-3) var(--space-4); }
+
+/* List group */
+.list-group-item { background: var(--surface-elevated); border-color: var(--color-border-0); color: var(--text-primary); }
+.list-group-item:hover { background: var(--surface-hover); }
+.list-group-item.active { background: var(--action-primary); border-color: var(--action-primary); color: var(--text-on-brand); }
+
+/* Progress */
+.progress { background: var(--surface-hover); border-radius: var(--radius-full); height: 8px; }
+.progress-bar { background: var(--action-primary); border-radius: var(--radius-full); }
+
+/* Spinner */
+.spinner-border { border-color: var(--action-primary) transparent transparent transparent; }
+.spinner-grow { background: var(--action-primary); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--surface-canvas); }
+::-webkit-scrollbar-thumb { background: var(--color-border-1); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Selection */
+::selection { background: oklch(var(--action-primary) / 0.3); color: var(--text-primary); }
+::-moz-selection { background: oklch(var(--action-primary) / 0.3); color: var(--text-primary); }
+
+/* Override Bootstrap light background utilities for dark mode */
+.bg-white,
+.bg-light,
+.bg-body,
+.bg-body-secondary,
+.bg-body-tertiary {
+  background: var(--surface-elevated) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Override Bootstrap text color utilities for dark mode */
+.text-body,
+.text-body-secondary,
+.text-body-tertiary,
+.text-dark {
+  color: var(--text-secondary) !important;
+}
+
+/* Override Bootstrap border utilities for dark mode */
+.border-light,
+.border-white {
+  border-color: var(--color-border-0) !important;
+}
+
+/* Override Bootstrap card utilities */
+.card.bg-light,
+.card.bg-white {
+  background: var(--surface-elevated) !important;
+  border-color: var(--color-border-0) !important;
+}
+
+/* Override Bootstrap table utilities */
+.table-light,
+.table-striped > tbody > tr:nth-of-type(odd).table-light {
+  background: var(--surface-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Override Bootstrap alert utilities */
+.alert-light {
+  background: var(--surface-hover) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--color-border-0) !important;
+}
+
+/* Override Bootstrap list group utilities */
+.list-group-item-light {
+  background: var(--surface-hover) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--color-border-0) !important;
+}
+
+/* Override Bootstrap pagination utilities */
+.page-item-light .page-link {
+  background: var(--surface-elevated) !important;
+  border-color: var(--color-border-0) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Override Bootstrap modal utilities */
+.modal-content.bg-light,
+.modal-content.bg-white {
+  background: var(--surface-elevated) !important;
+  border-color: var(--color-border-0) !important;
+}
+
+/* Override Bootstrap dropdown utilities */
+.dropdown-menu.bg-light,
+.dropdown-menu.bg-white {
+  background: var(--surface-elevated) !important;
+  border-color: var(--color-border-0) !important;
+}
+
+/* Override Bootstrap toast utilities */
+.toast.bg-light,
+.toast.bg-white {
+  background: var(--surface-elevated) !important;
+  border-color: var(--color-border-0) !important;
+}
+
+.toast-header.bg-light,
+.toast-header.bg-white {
+  background: var(--surface-elevated) !important;
+  border-color: var(--color-border-0) !important;
+}
+
+/* Print */
+@media print {
+  .navbar-cinema, .footer-cinema, .btn, .search-wrapper, .tab-nav-cinema, .carousel-control-cinema, .carousel-indicators-cinema, .modal, .modal-backdrop, .dropdown-menu { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  a { text-decoration: none; color: black; }
+}

@@ -1,0 +1,434 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var allTopRatedMovies =
+        ViewBag.TopRatedMovies as List<CinemaManagement.Models.Movie>
+        ?? new List<CinemaManagement.Models.Movie>();
+
+    // CHỈ DÙNG PHIM CÓ BANNER (16:9)
+    var topRateBanners = allTopRatedMovies
+        .Where(m => !string.IsNullOrWhiteSpace(m.BannerUrl))
+        .ToList();
+}
+
+@section Styles {
+    <style>
+        /* Hero-specific overrides */
+        .hero-section {
+            background: radial-gradient(ellipse 80% 50% at 50% 0%, oklch(0.12 0.02 25) 0%, var(--surface-canvas) 70%);
+            padding-block: var(--space-9);
+        }
+
+        .hero-banner-wrapper {
+            max-width: 1100px;
+            margin-inline: auto;
+        }
+
+        .hero-banner {
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+            box-shadow: var(--shadow-4);
+            background: var(--surface-overlay);
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, oklch(0 0 0 / 0.9) 0%, oklch(0 0 0 / 0.4) 40%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-banner-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: var(--space-8) var(--space-6) var(--space-6);
+            color: var(--text-primary);
+            z-index: 1;
+        }
+
+        .hero-banner-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            text-wrap: balance;
+            text-shadow: 0 2px 8px oklch(0 0 0 / 0.5);
+            margin-bottom: var(--space-3);
+        }
+
+        .hero-banner-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--space-4);
+            font-size: var(--text-body-sm);
+            color: var(--text-secondary);
+        }
+
+        .hero-banner-rating {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            color: var(--color-gold);
+            font-weight: 500;
+        }
+
+        .hero-banner-genres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+        }
+
+        .carousel-control-cinema {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-full);
+            background: oklch(0 0 0 / 0.5);
+            border: 1px solid var(--color-border-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: all var(--duration-2) var(--ease-standard);
+            z-index: 10;
+        }
+
+        .carousel-control-cinema:hover {
+            background: var(--action-primary);
+            border-color: var(--action-primary);
+            color: var(--text-on-brand);
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .carousel-control-cinema:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .carousel-control-cinema:focus-visible {
+            outline: none;
+            box-shadow: var(--shadow-focus);
+        }
+
+        .carousel-control-cinema.prev { left: var(--space-4); }
+        .carousel-control-cinema.next { right: var(--space-4); }
+
+        .carousel-control-cinema i { font-size: 1.25rem; }
+
+        .carousel-indicators-cinema {
+            position: absolute;
+            bottom: var(--space-4);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: var(--space-2);
+            z-index: 10;
+        }
+
+        .carousel-indicator-cinema {
+            width: 10px;
+            height: 10px;
+            border-radius: var(--radius-full);
+            background: oklch(1 0 0 / 0.4);
+            border: none;
+            cursor: pointer;
+            transition: all var(--duration-2) var(--ease-expressive);
+        }
+
+        .carousel-indicator-cinema.active {
+            background: var(--action-primary);
+            transform: scale(1.3);
+        }
+
+        .carousel-indicator-cinema:hover {
+            background: oklch(1 0 0 / 0.7);
+        }
+
+        .carousel-indicator-cinema:focus-visible {
+            outline: none;
+            box-shadow: var(--shadow-focus);
+        }
+
+        /* CTA Buttons */
+        .cta-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--space-4);
+            margin-top: var(--space-8);
+        }
+
+        .cta-btn {
+            font-family: var(--font-display);
+            font-size: var(--text-label);
+            font-weight: 600;
+            letter-spacing: var(--ls-label);
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-full);
+            min-height: 52px;
+            transition: all var(--duration-2) var(--ease-standard);
+        }
+
+        .cta-btn-primary {
+            background: var(--action-primary);
+            color: var(--text-on-brand);
+            border: none;
+        }
+
+        .cta-btn-primary:hover {
+            background: var(--action-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2);
+        }
+
+        .cta-btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--color-border-1);
+        }
+
+        .cta-btn-secondary:hover {
+            border-color: var(--action-primary);
+            color: var(--action-primary);
+            background: oklch(var(--action-primary) / 0.08);
+        }
+
+        /* Empty state */
+        .hero-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 16 / 9;
+            background: var(--surface-elevated);
+            border: 1px dashed var(--color-border-1);
+            border-radius: var(--radius-xl);
+            color: var(--text-muted);
+            text-align: center;
+            padding: var(--space-8);
+        }
+
+        .hero-empty i { font-size: 4rem; margin-bottom: var(--space-4); opacity: 0.5; }
+        .hero-empty h3 { font-family: var(--font-display); font-size: var(--text-heading-2); color: var(--text-secondary); margin-bottom: var(--space-2); }
+        .hero-empty p { font-size: var(--text-body); max-width: 400px; }
+
+        /* Section header */
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--gap-section);
+        }
+
+        .section-header .eyebrow {
+            display: inline-block;
+            font-family: var(--font-display);
+            font-size: var(--text-caption);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--action-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .section-header h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        /* Movie cards grid - using design system */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: var(--gap-inline) var(--gap-stack);
+        }
+
+        @@media (min-width: 640px) { .movie-grid { grid-template-columns: repeat(2, 1fr); } }
+        @@media (min-width: 1024px) { .movie-grid { grid-template-columns: repeat(3, 1fr); } }
+        @@media (min-width: 1280px) { .movie-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        /* Entrance animations */
+        .hero-banner { animation: fade-in-up var(--duration-4) var(--ease-expressive) forwards; opacity: 0; }
+        .cta-group { animation: fade-in-up var(--duration-4) var(--ease-expressive) forwards; opacity: 0; animation-delay: 200ms; }
+        .section-header { animation: fade-in-up var(--duration-3) var(--ease-standard) forwards; opacity: 0; animation-delay: 100ms; }
+        .movie-grid > * { animation: fade-in-up var(--duration-3) var(--ease-standard) forwards; opacity: 0; }
+        .movie-grid > *:nth-child(1) { animation-delay: 100ms; }
+        .movie-grid > *:nth-child(2) { animation-delay: 150ms; }
+        .movie-grid > *:nth-child(3) { animation-delay: 200ms; }
+        .movie-grid > *:nth-child(4) { animation-delay: 250ms; }
+        .movie-grid > *:nth-child(5) { animation-delay: 300ms; }
+        .movie-grid > *:nth-child(6) { animation-delay: 350ms; }
+        .movie-grid > *:nth-child(7) { animation-delay: 400ms; }
+        .movie-grid > *:nth-child(8) { animation-delay: 450ms; }
+
+        @@media (prefers-reduced-motion: reduce) {
+            .hero-banner, .cta-group, .section-header, .movie-grid > * {
+                animation: none !important;
+                opacity: 1 !important;
+            }
+        }
+    </style>
+}
+
+<!-- ================= HERO SECTION ================= -->
+<section class="hero-section" aria-labelledby="hero-title">
+    <div class="container-cinema">
+        <div class="hero-banner-wrapper">
+            @if (topRateBanners.Any())
+            {
+                <div id="heroCarousel" class="hero-banner position-relative" data-bs-ride="carousel" data-bs-interval="6000" role="region" aria-label="Phim hot trong rạp">
+                    <div class="carousel-inner h-100">
+                        @for (int i = 0; i < topRateBanners.Count; i++)
+                        {
+                            var movie = topRateBanners[i];
+                            <div class="carousel-item @(i == 0 ? "active" : "") h-100 position-relative">
+                                <img src="@movie.BannerUrl" class="d-block w-100 h-100" alt="@movie.Title" loading="@(i == 0 ? "eager" : "lazy")" />
+                                <div class="hero-banner-content">
+                                    <h1 id="hero-title" class="hero-banner-title">@movie.Title</h1>
+                                    <div class="hero-banner-meta">
+                                        <span class="hero-banner-rating" aria-label="Đánh giá @movie.Rating trên 10">
+                                            <i class="fas fa-star" aria-hidden="true"></i>
+                                            <span>@movie.Rating / 10</span>
+                                        </span>
+                                        @if (movie.MovieGenres != null && movie.MovieGenres.Any())
+                                        {
+                                            <div class="hero-banner-genres" role="list" aria-label="Thể loại phim">
+                                                @foreach (var mg in movie.MovieGenres.Take(3))
+                                                {
+                                                    <span class="badge badge-genre" role="listitem">@mg.Genre.Name</span>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @if (topRateBanners.Count > 1)
+                    {
+                        <button class="carousel-control-cinema prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Phim trước">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <button class="carousel-control-cinema next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Phim sau">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+
+                        <div class="carousel-indicators-cinema" role="tablist" aria-label="Chọn phim">
+                            @for (int i = 0; i < topRateBanners.Count; i++)
+                            {
+                                <button type="button" class="carousel-indicator-cinema @(i == 0 ? "active" : "")" data-bs-target="#heroCarousel" data-bs-slide-to="@i" role="tab" aria-label="Phim @(i + 1)" aria-selected="@(i == 0)" aria-controls="heroCarousel"></button>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="hero-empty" role="img" aria-label="Chưa có phim nổi bật">
+                    <i class="fas fa-film" aria-hidden="true"></i>
+                    <h3>Chưa có phim nổi bật</h3>
+                    <p>Hiện tại chưa có phim nào có banner để hiển thị. Vui lòng quay lại sau.</p>
+                </div>
+            }
+
+            <!-- CTA Buttons -->
+            <div class="cta-group" role="group" aria-label="Hành động chính">
+                <a href="@Url.Action("NowShowing", "Movies")" class="cta-btn cta-btn-primary btn-block btn-lg" role="button">
+                    <i class="fas fa-ticket-alt me-2" aria-hidden="true"></i> Phim đang chiếu
+                </a>
+                <a href="@Url.Action("ComingSoon", "Movies")" class="cta-btn cta-btn-secondary btn-block btn-lg" role="button">
+                    <i class="fas fa-clock me-2" aria-hidden="true"></i> Phim sắp chiếu
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= VALUE PROPS / FEATURES ================= -->
+<section class="section section-compact" aria-labelledby="features-title">
+    <div class="container-cinema">
+        <div class="section-header">
+            <span class="eyebrow">Tính năng</span>
+            <h2 id="features-title">Trải nghiệm điện ảnh trọn vẹn</h2>
+        </div>
+
+        <div class="movie-grid" role="list">
+            <article class="card card-interactive" role="listitem">
+                <div class="card-body text-center py-5">
+                    <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: var(--radius-lg); background: oklch(var(--action-primary) / 0.15); color: var(--action-primary);">
+                        <i class="fas fa-search" style="font-size: 1.5rem;" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="card-title">Tìm kiếm thông minh</h3>
+                    <p class="card-text">Lọc phim theo thể loại, rạp, thời gian. Tìm kiếm bằng giọng nói tiếng Việt.</p>
+                </div>
+            </article>
+
+            <article class="card card-interactive" role="listitem">
+                <div class="card-body text-center py-5">
+                    <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: var(--radius-lg); background: oklch(var(--color-gold) / 0.15); color: var(--color-gold);">
+                        <i class="fas fa-star" style="font-size: 1.5rem;" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="card-title">Đánh giá thật</h3>
+                    <p class="card-text">Xem rating, trailer, mô tả chi tiết trước khi quyết định mua vé.</p>
+                </div>
+            </article>
+
+            <article class="card card-interactive" role="listitem">
+                <div class="card-body text-center py-5">
+                    <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: var(--radius-lg); background: oklch(var(--state-success) / 0.15); color: var(--state-success);">
+                        <i class="fas fa-chair" style="font-size: 1.5rem;" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="card-title">Chọn ghế trực quan</h3>
+                    <p class="card-text">Sơ đồ ghế thực tế, xem trạng thái real-time, chọn vị trí yêu thích.</p>
+                </div>
+            </article>
+
+            <article class="card card-interactive" role="listitem">
+                <div class="card-body text-center py-5">
+                    <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: var(--radius-lg); background: oklch(var(--state-warning) / 0.15); color: var(--state-warning);">
+                        <i class="fas fa-qrcode" style="font-size: 1.5rem;" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="card-title">Thanh toán nhanh</h3>
+                    <p class="card-text">MoMo QR, tiền mặt, thẻ. Vé điện tử với mã QR vào rạp ngay.</p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ================= FOOTER CTA ================= -->
+<section class="section" style="background: var(--surface-elevated); border-top: 1px solid var(--color-border-0);" aria-labelledby="cta-title">
+    <div class="container-cinema text-center">
+        <h2 id="cta-title" class="section-header" style="margin-bottom: var(--space-5);">
+            <span class="eyebrow">Sẵn sàng?</span>
+            <h2 style="font-size: clamp(1.5rem, 3vw, 2.25rem);">Đặt vé ngay hôm nay</h2>
+        </h2>
+        <p class="lead mb-6" style="max-width: 600px; margin-inline: auto;">Khám phá phim mới, chọn suất chiếu phù hợp, và trải nghiệm không gian rạp hiện đại.</p>
+        <div class="cta-group">
+            <a href="@Url.Action("NowShowing", "Movies")" class="cta-btn cta-btn-primary btn-lg" role="button">
+                <i class="fas fa-play me-2" aria-hidden="true"></i> Xem phim đang chiếu
+            </a>
+            <a href="@Url.Action("ComingSoon", "Movies")" class="cta-btn cta-btn-secondary btn-lg" role="button">
+                <i class="fas fa-calendar-plus me-2" aria-hidden="true"></i> Xem phim sắp chiếu
+            </a>
+        </div>
+    </div>
+</section>

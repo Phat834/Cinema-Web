@@ -1,0 +1,110 @@
+﻿@model CinemaManagement.ViewModel.SeatSelectionViewModel
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    body { background: #0b0b0b; color: #fff; }
+    .screen { background: radial-gradient(ellipse at center,#f8f8f8 0%,#cfcfcf 70%); color: #000; font-weight: 900; letter-spacing: 4px; text-align: center; padding: 14px; border-radius: 10px; margin-bottom: 20px; }
+    .seat { width: 56px; height: 56px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; position: relative; color: #fff; }
+    .seat:hover:not(.seat-booked) { transform: scale(1.08); box-shadow: 0 6px 18px rgba(0,0,0,.7); }
+    .seat-regular { background: #6c757d; }
+    .seat-vip { background: #f1c40f; color: #000; }
+    .seat-couple { background: #d63384; }
+    .seat-selected { outline: 4px solid #00e5ff; box-shadow: 0 0 16px rgba(0,229,255,.9); transform: scale(1.15); z-index: 2; }
+    .seat-booked { background: #444 !important; opacity: .5; cursor: not-allowed; }
+    .seat-label { position: absolute; top: 4px; right: 4px; font-size: .6rem; font-weight: 900; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.65); }
+    .seat-vip .seat-label { background: #f1c40f; color: #000; }
+    .seat-couple .seat-label { background: #d63384; }
+    .price-box { background: #1c1c1c; border-radius: 12px; padding: 16px; box-shadow: 0 0 12px rgba(255,77,109,.25); }
+</style>
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-4 text-center">
+            <img src="@Model.Movie.PosterUrl" class="img-fluid rounded shadow" style="max-height:420px">
+        </div>
+        <div class="col-md-8">
+            <h3 class="text-warning mb-3">@Model.Movie.Title</h3>
+            <p><b>Phòng:</b> <span class="text-warning">@Model.Room.Name</span></p>
+            <p><b>Thời gian:</b> <span class="text-warning">@Model.Showtime.StartTime.ToString("dd/MM/yyyy HH:mm")</span></p>
+            <p><b>Giữ ghế còn:</b> <span id="bookingTimer" class="text-warning fw-bold"></span></p>
+            <div class="price-box mt-3">
+                <p>Giá gốc: <span class="text-warning">@Model.BasePrice.ToString("#,##0")</span> đ</p>
+                <hr class="text-secondary" />
+                <p>Phụ thu ghế thường: <span class="text-warning">@Model.PriceRegular.ToString("#,##0")</span> đ</p>
+                <p>Phụ thu ghế VIP: <span class="text-warning">@Model.PriceVip.ToString("#,##0")</span> đ</p>
+                <p>Phụ thu ghế đôi: <span class="text-warning">@Model.PriceCouple.ToString("#,##0")</span> đ</p>
+                @if (Model.DiscountPercent.HasValue && Model.DiscountStart <= DateTime.Now && Model.DiscountEnd >= DateTime.Now)
+                {
+                    <p class="text-success fw-bold mt-2">Giảm giá @Model.DiscountPercent%</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="screen">MÀN HÌNH</div>
+    @{ int perRow = 8; }
+    @for (int i = 0; i < Model.AvailableSeats.Count; i += perRow)
+    {
+        int rowIndex = i / perRow;
+        <div class="d-flex justify-content-center gap-3 mb-2">
+            @{ var rowSeats = Model.AvailableSeats.Skip(i).Take(perRow).ToList(); }
+            @for (int colIndex = 0; colIndex < rowSeats.Count; colIndex++)
+            {
+                var seat = rowSeats[colIndex];
+                bool booked = Model.PaidSeatIds.Contains(seat.SeatId) || Model.ReservedSeatIds.Contains(seat.SeatId);
+                var type = seat.SeatType.ToString();
+                var css = type == "Vip" ? "seat-vip" : type == "Couple" ? "seat-couple" : "seat-regular";
+                <button class="seat @css @(booked ? "seat-booked" : "")" data-id="@seat.SeatId" data-type="@type" data-row-index="@rowIndex" data-col-index="@colIndex" @(booked ? "disabled" : "")>
+                    <span class="seat-label">@(type == "Vip" ? "VIP" : type == "Couple" ? "ĐÔI" : "THƯỜNG")</span>
+                    @seat.SeatNumber
+                </button>
+            }
+        </div>
+    }
+
+    <div class="text-center mt-4">
+        <h5>Tổng tiền: <span id="totalPrice" class="text-warning">0</span> đ</h5>
+        <button id="confirmBooking" class="btn btn-info px-4" disabled>
+            <i class="bi bi-ticket-perforated"></i> Xác nhận vé
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script src="~/js/seatHubClient.js" asp-append-version="true"></script>
+    <script src="~/js/bookingTimer.js" asp-append-version="true"></script>
+    <script src="~/js/seatMatrix.js" asp-append-version="true"></script>
+    <script>
+        // Kiểm tra ghế lẻ ở đầu/cuối hàng (giữ logic hiện có).
+        function hasEdgeSeatLeft() {
+            const seats = Array.from(document.querySelectorAll(".seat:not(.seat-booked)"));
+            const selectedIds = Array.from(document.querySelectorAll(".seat.seat-selected")).map(s => s.dataset.id);
+            const seatMap = {};
+            seats.forEach(seat => {
+                const row = seat.dataset.rowIndex, col = parseInt(seat.dataset.colIndex);
+                if (!seatMap[row]) seatMap[row] = [];
+                seatMap[row][col] = { isSelected: selectedIds.includes(seat.dataset.id) };
+            });
+            for (const row in seatMap) {
+                const r = seatMap[row], last = r.length - 1;
+                if (r[0] && !r[0].isSelected && r[1] && r[1].isSelected && !r.slice(2).some(x => x && x.isSelected)) return true;
+                if (r[last] && !r[last].isSelected && last >= 1 && r[last - 1] && r[last - 1].isSelected && !r.slice(0, last - 1).some(x => x && x.isSelected)) return true;
+            }
+            return false;
+        }
+
+        const pricing = {
+            basePrice: @Model.BasePrice,
+            extra: { Regular: @Model.PriceRegular, Vip: @Model.PriceVip, Couple: @Model.PriceCouple },
+            discountMul: @(Model.DiscountPercent.HasValue && Model.DiscountStart <= DateTime.Now && Model.DiscountEnd >= DateTime.Now
+                ? (1 - (Model.DiscountPercent.Value / 100m)).ToString(System.Globalization.CultureInfo.InvariantCulture)
+                : "1"),
+            showtimeId: @Model.ShowtimeId
+        };
+        const hub = SeatHubClient.init({ hubUrl: "/cinemaHub", showtimeId: pricing.showtimeId });
+        BookingTimer.init({ minutes: @Model.ReservationTimeoutMinutes, selector: "#bookingTimer", redirectUrl: "@Url.Action("Index", "Booking", new { movieId = Model.Movie.MovieId })" });
+        SeatMatrix.init({ ...pricing, hub, confirmUrl: "/Booking/ConfirmBooking", totalSelector: "#totalPrice", confirmSelector: "#confirmBooking", hasEdgeSeatLeft });
+    </script>
+}
