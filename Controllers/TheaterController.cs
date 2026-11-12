@@ -23,6 +23,7 @@ namespace CinemaManagement.Controllers
         public IActionResult Index()
         {
             var theaters = _context.Theaters
+                .AsNoTracking()
                 .Include(t => t.Rooms)
                 .ToList();
 
@@ -33,6 +34,7 @@ namespace CinemaManagement.Controllers
         public IActionResult Details(int id)
         {
             var theater = _context.Theaters
+                .AsNoTracking()
                 .Include(t => t.Rooms)
                     .ThenInclude(r => r.Seats)
                 .FirstOrDefault(t => t.TheaterId == id);

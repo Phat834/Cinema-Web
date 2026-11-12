@@ -1,12 +1,12 @@
-﻿@{
-    ViewData["Title"] = "Trang chủ";
+@{
+    ViewData["Title"] = "Trang ch?";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var allTopRatedMovies =
         ViewBag.TopRatedMovies as List<CinemaManagement.Models.Movie>
         ?? new List<CinemaManagement.Models.Movie>();
 
-    // CHỈ DÙNG PHIM CÓ BANNER (16:9)
+    // CH? D�NG PHIM C� BANNER (16:9)
     var topRateBanners = allTopRatedMovies
         .Where(m => !string.IsNullOrWhiteSpace(m.BannerUrl))
         .ToList();
@@ -104,7 +104,7 @@
             align-items: center;
             justify-content: center;
             color: var(--text-primary);
-            transition: all var(--duration-2) var(--ease-standard);
+            transition: transform var(--duration-2) var(--ease-standard), background var(--duration-2) var(--ease-standard), color var(--duration-2) var(--ease-standard), border-color var(--duration-2) var(--ease-standard);
             z-index: 10;
         }
 
@@ -146,7 +146,7 @@
             background: oklch(1 0 0 / 0.4);
             border: none;
             cursor: pointer;
-            transition: all var(--duration-2) var(--ease-expressive);
+            transition: transform var(--duration-2) var(--ease-expressive), background var(--duration-2) var(--ease-expressive);
         }
 
         .carousel-indicator-cinema.active {
@@ -180,7 +180,7 @@
             padding: var(--space-3) var(--space-6);
             border-radius: var(--radius-full);
             min-height: 52px;
-            transition: all var(--duration-2) var(--ease-standard);
+            transition: transform var(--duration-2) var(--ease-standard), background var(--duration-2) var(--ease-standard), color var(--duration-2) var(--ease-standard), border-color var(--duration-2) var(--ease-standard);
         }
 
         .cta-btn-primary {
@@ -293,7 +293,7 @@
         <div class="hero-banner-wrapper">
             @if (topRateBanners.Any())
             {
-                <div id="heroCarousel" class="hero-banner position-relative" data-bs-ride="carousel" data-bs-interval="6000" role="region" aria-label="Phim hot trong rạp">
+                <div id="heroCarousel" class="hero-banner position-relative" data-bs-ride="carousel" data-bs-interval="6000" role="region" aria-label="Phim hot trong r?p">
                     <div class="carousel-inner h-100">
                         @for (int i = 0; i < topRateBanners.Count; i++)
                         {
@@ -303,13 +303,13 @@
                                 <div class="hero-banner-content">
                                     <h1 id="hero-title" class="hero-banner-title">@movie.Title</h1>
                                     <div class="hero-banner-meta">
-                                        <span class="hero-banner-rating" aria-label="Đánh giá @movie.Rating trên 10">
+                                        <span class="hero-banner-rating" aria-label="��nh gi� @movie.Rating tr�n 10">
                                             <i class="fas fa-star" aria-hidden="true"></i>
                                             <span>@movie.Rating / 10</span>
                                         </span>
                                         @if (movie.MovieGenres != null && movie.MovieGenres.Any())
                                         {
-                                            <div class="hero-banner-genres" role="list" aria-label="Thể loại phim">
+                                            <div class="hero-banner-genres" role="list" aria-label="Th? lo?i phim">
                                                 @foreach (var mg in movie.MovieGenres.Take(3))
                                                 {
                                                     <span class="badge badge-genre" role="listitem">@mg.Genre.Name</span>
@@ -324,14 +324,14 @@
 
                     @if (topRateBanners.Count > 1)
                     {
-                        <button class="carousel-control-cinema prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Phim trước">
+                        <button class="carousel-control-cinema prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Phim tru?c">
                             <i class="fas fa-chevron-left" aria-hidden="true"></i>
                         </button>
                         <button class="carousel-control-cinema next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Phim sau">
                             <i class="fas fa-chevron-right" aria-hidden="true"></i>
                         </button>
 
-                        <div class="carousel-indicators-cinema" role="tablist" aria-label="Chọn phim">
+                        <div class="carousel-indicators-cinema" role="tablist" aria-label="Ch?n phim">
                             @for (int i = 0; i < topRateBanners.Count; i++)
                             {
                                 <button type="button" class="carousel-indicator-cinema @(i == 0 ? "active" : "")" data-bs-target="#heroCarousel" data-bs-slide-to="@i" role="tab" aria-label="Phim @(i + 1)" aria-selected="@(i == 0)" aria-controls="heroCarousel"></button>
@@ -342,20 +342,20 @@
             }
             else
             {
-                <div class="hero-empty" role="img" aria-label="Chưa có phim nổi bật">
+                <div class="hero-empty" role="img" aria-label="Chua c� phim n?i b?t">
                     <i class="fas fa-film" aria-hidden="true"></i>
-                    <h3>Chưa có phim nổi bật</h3>
-                    <p>Hiện tại chưa có phim nào có banner để hiển thị. Vui lòng quay lại sau.</p>
+                    <h3>Chua c� phim n?i b?t</h3>
+                    <p>Hi?n t?i chua c� phim n�o c� banner d? hi?n th?. Vui l�ng quay l?i sau.</p>
                 </div>
             }
 
             <!-- CTA Buttons -->
-            <div class="cta-group" role="group" aria-label="Hành động chính">
+            <div class="cta-group" role="group" aria-label="H�nh d?ng ch�nh">
                 <a href="@Url.Action("NowShowing", "Movies")" class="cta-btn cta-btn-primary btn-block btn-lg" role="button">
-                    <i class="fas fa-ticket-alt me-2" aria-hidden="true"></i> Phim đang chiếu
+                    <i class="fas fa-ticket-alt me-2" aria-hidden="true"></i> Phim dang chi?u
                 </a>
                 <a href="@Url.Action("ComingSoon", "Movies")" class="cta-btn cta-btn-secondary btn-block btn-lg" role="button">
-                    <i class="fas fa-clock me-2" aria-hidden="true"></i> Phim sắp chiếu
+                    <i class="fas fa-clock me-2" aria-hidden="true"></i> Phim s?p chi?u
                 </a>
             </div>
         </div>
@@ -366,8 +366,8 @@
 <section class="section section-compact" aria-labelledby="features-title">
     <div class="container-cinema">
         <div class="section-header">
-            <span class="eyebrow">Tính năng</span>
-            <h2 id="features-title">Trải nghiệm điện ảnh trọn vẹn</h2>
+            <span class="eyebrow">T�nh nang</span>
+            <h2 id="features-title">Tr?i nghi?m di?n ?nh tr?n v?n</h2>
         </div>
 
         <div class="movie-grid" role="list">
@@ -376,8 +376,8 @@
                     <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: var(--radius-lg); background: oklch(var(--action-primary) / 0.15); color: var(--action-primary);">
                         <i class="fas fa-search" style="font-size: 1.5rem;" aria-hidden="true"></i>
                     </div>
-                    <h3 class="card-title">Tìm kiếm thông minh</h3>
-                    <p class="card-text">Lọc phim theo thể loại, rạp, thời gian. Tìm kiếm bằng giọng nói tiếng Việt.</p>
+                    <h3 class="card-title">T�m ki?m th�ng minh</h3>
+                    <p class="card-text">L?c phim theo th? lo?i, r?p, th?i gian. T�m ki?m b?ng gi?ng n�i ti?ng Vi?t.</p>
                 </div>
             </article>
 
@@ -386,8 +386,8 @@
                     <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: var(--radius-lg); background: oklch(var(--color-gold) / 0.15); color: var(--color-gold);">
                         <i class="fas fa-star" style="font-size: 1.5rem;" aria-hidden="true"></i>
                     </div>
-                    <h3 class="card-title">Đánh giá thật</h3>
-                    <p class="card-text">Xem rating, trailer, mô tả chi tiết trước khi quyết định mua vé.</p>
+                    <h3 class="card-title">��nh gi� th?t</h3>
+                    <p class="card-text">Xem rating, trailer, m� t? chi ti?t tru?c khi quy?t d?nh mua v�.</p>
                 </div>
             </article>
 
@@ -396,8 +396,8 @@
                     <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: var(--radius-lg); background: oklch(var(--state-success) / 0.15); color: var(--state-success);">
                         <i class="fas fa-chair" style="font-size: 1.5rem;" aria-hidden="true"></i>
                     </div>
-                    <h3 class="card-title">Chọn ghế trực quan</h3>
-                    <p class="card-text">Sơ đồ ghế thực tế, xem trạng thái real-time, chọn vị trí yêu thích.</p>
+                    <h3 class="card-title">Ch?n gh? tr?c quan</h3>
+                    <p class="card-text">So d? gh? th?c t?, xem tr?ng th�i real-time, ch?n v? tr� y�u th�ch.</p>
                 </div>
             </article>
 
@@ -406,8 +406,8 @@
                     <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px; border-radius: var(--radius-lg); background: oklch(var(--state-warning) / 0.15); color: var(--state-warning);">
                         <i class="fas fa-qrcode" style="font-size: 1.5rem;" aria-hidden="true"></i>
                     </div>
-                    <h3 class="card-title">Thanh toán nhanh</h3>
-                    <p class="card-text">MoMo QR, tiền mặt, thẻ. Vé điện tử với mã QR vào rạp ngay.</p>
+                    <h3 class="card-title">Thanh to�n nhanh</h3>
+                    <p class="card-text">MoMo QR, ti?n m?t, th?. V� di?n t? v?i m� QR v�o r?p ngay.</p>
                 </div>
             </article>
         </div>
@@ -418,16 +418,16 @@
 <section class="section" style="background: var(--surface-elevated); border-top: 1px solid var(--color-border-0);" aria-labelledby="cta-title">
     <div class="container-cinema text-center">
         <h2 id="cta-title" class="section-header" style="margin-bottom: var(--space-5);">
-            <span class="eyebrow">Sẵn sàng?</span>
-            <h2 style="font-size: clamp(1.5rem, 3vw, 2.25rem);">Đặt vé ngay hôm nay</h2>
+            <span class="eyebrow">S?n s�ng?</span>
+            <h2 style="font-size: clamp(1.5rem, 3vw, 2.25rem);">�?t v� ngay h�m nay</h2>
         </h2>
-        <p class="lead mb-6" style="max-width: 600px; margin-inline: auto;">Khám phá phim mới, chọn suất chiếu phù hợp, và trải nghiệm không gian rạp hiện đại.</p>
+        <p class="lead mb-6" style="max-width: 600px; margin-inline: auto;">Kh�m ph� phim m?i, ch?n su?t chi?u ph� h?p, v� tr?i nghi?m kh�ng gian r?p hi?n d?i.</p>
         <div class="cta-group">
             <a href="@Url.Action("NowShowing", "Movies")" class="cta-btn cta-btn-primary btn-lg" role="button">
-                <i class="fas fa-play me-2" aria-hidden="true"></i> Xem phim đang chiếu
+                <i class="fas fa-play me-2" aria-hidden="true"></i> Xem phim dang chi?u
             </a>
             <a href="@Url.Action("ComingSoon", "Movies")" class="cta-btn cta-btn-secondary btn-lg" role="button">
-                <i class="fas fa-calendar-plus me-2" aria-hidden="true"></i> Xem phim sắp chiếu
+                <i class="fas fa-calendar-plus me-2" aria-hidden="true"></i> Xem phim s?p chi?u
             </a>
         </div>
     </div>

@@ -27,7 +27,7 @@
                 <div class="card mb-3">
                     @if (!string.IsNullOrEmpty(Model.ImageUrl))
                     {
-                        <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="height: 150px; object-fit: cover;">
+                        <img loading="lazy" src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="height: 150px; object-fit: cover;">
                     }
                     else
                     {

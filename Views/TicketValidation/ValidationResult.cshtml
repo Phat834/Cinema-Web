@@ -95,7 +95,7 @@
         border-radius: 25px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         margin-top: 20px;
     }
     .btn-back:hover {
@@ -192,7 +192,7 @@
                 @if (!ticket.IsPaid)
                 {
                     <div class="qr-code">
-                        <img src="/api/qr?text=@ticket.TicketId" alt="QR Code" style="width: 100px; height: 100px;">
+                        <img loading="lazy" src="/api/qr?text=@ticket.TicketId" alt="QR Code" style="width: 100px; height: 100px;">
                     </div>
                 }
             </div>

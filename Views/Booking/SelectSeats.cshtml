@@ -1,4 +1,4 @@
-﻿@model CinemaManagement.ViewModel.SeatSelectionViewModel
+@model CinemaManagement.ViewModel.SeatSelectionViewModel
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
@@ -21,28 +21,28 @@
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-md-4 text-center">
-            <img src="@Model.Movie.PosterUrl" class="img-fluid rounded shadow" style="max-height:420px">
+            <img loading="lazy" src="@Model.Movie.PosterUrl" class="img-fluid rounded shadow" style="max-height:420px">
         </div>
         <div class="col-md-8">
             <h3 class="text-warning mb-3">@Model.Movie.Title</h3>
-            <p><b>Phòng:</b> <span class="text-warning">@Model.Room.Name</span></p>
-            <p><b>Thời gian:</b> <span class="text-warning">@Model.Showtime.StartTime.ToString("dd/MM/yyyy HH:mm")</span></p>
-            <p><b>Giữ ghế còn:</b> <span id="bookingTimer" class="text-warning fw-bold"></span></p>
+            <p><b>Ph�ng:</b> <span class="text-warning">@Model.Room.Name</span></p>
+            <p><b>Th?i gian:</b> <span class="text-warning">@Model.Showtime.StartTime.ToString("dd/MM/yyyy HH:mm")</span></p>
+            <p><b>Gi? gh? c�n:</b> <span id="bookingTimer" class="text-warning fw-bold"></span></p>
             <div class="price-box mt-3">
-                <p>Giá gốc: <span class="text-warning">@Model.BasePrice.ToString("#,##0")</span> đ</p>
+                <p>Gi� g?c: <span class="text-warning">@Model.BasePrice.ToString("#,##0")</span> d</p>
                 <hr class="text-secondary" />
-                <p>Phụ thu ghế thường: <span class="text-warning">@Model.PriceRegular.ToString("#,##0")</span> đ</p>
-                <p>Phụ thu ghế VIP: <span class="text-warning">@Model.PriceVip.ToString("#,##0")</span> đ</p>
-                <p>Phụ thu ghế đôi: <span class="text-warning">@Model.PriceCouple.ToString("#,##0")</span> đ</p>
+                <p>Ph? thu gh? thu?ng: <span class="text-warning">@Model.PriceRegular.ToString("#,##0")</span> d</p>
+                <p>Ph? thu gh? VIP: <span class="text-warning">@Model.PriceVip.ToString("#,##0")</span> d</p>
+                <p>Ph? thu gh? d�i: <span class="text-warning">@Model.PriceCouple.ToString("#,##0")</span> d</p>
                 @if (Model.DiscountPercent.HasValue && Model.DiscountStart <= DateTime.Now && Model.DiscountEnd >= DateTime.Now)
                 {
-                    <p class="text-success fw-bold mt-2">Giảm giá @Model.DiscountPercent%</p>
+                    <p class="text-success fw-bold mt-2">Gi?m gi� @Model.DiscountPercent%</p>
                 }
             </div>
         </div>
     </div>
 
-    <div class="screen">MÀN HÌNH</div>
+    <div class="screen">M�N H�NH</div>
     @{ int perRow = 8; }
     @for (int i = 0; i < Model.AvailableSeats.Count; i += perRow)
     {
@@ -56,7 +56,7 @@
                 var type = seat.SeatType.ToString();
                 var css = type == "Vip" ? "seat-vip" : type == "Couple" ? "seat-couple" : "seat-regular";
                 <button class="seat @css @(booked ? "seat-booked" : "")" data-id="@seat.SeatId" data-type="@type" data-row-index="@rowIndex" data-col-index="@colIndex" @(booked ? "disabled" : "")>
-                    <span class="seat-label">@(type == "Vip" ? "VIP" : type == "Couple" ? "ĐÔI" : "THƯỜNG")</span>
+                    <span class="seat-label">@(type == "Vip" ? "VIP" : type == "Couple" ? "��I" : "THU?NG")</span>
                     @seat.SeatNumber
                 </button>
             }
@@ -64,9 +64,9 @@
     }
 
     <div class="text-center mt-4">
-        <h5>Tổng tiền: <span id="totalPrice" class="text-warning">0</span> đ</h5>
+        <h5>T?ng ti?n: <span id="totalPrice" class="text-warning">0</span> d</h5>
         <button id="confirmBooking" class="btn btn-info px-4" disabled>
-            <i class="bi bi-ticket-perforated"></i> Xác nhận vé
+            <i class="bi bi-ticket-perforated"></i> X�c nh?n v�
         </button>
     </div>
 </div>
@@ -77,7 +77,7 @@
     <script src="~/js/bookingTimer.js" asp-append-version="true"></script>
     <script src="~/js/seatMatrix.js" asp-append-version="true"></script>
     <script>
-        // Kiểm tra ghế lẻ ở đầu/cuối hàng (giữ logic hiện có).
+        // Ki?m tra gh? l? ? d?u/cu?i h�ng (gi? logic hi?n c�).
         function hasEdgeSeatLeft() {
             const seats = Array.from(document.querySelectorAll(".seat:not(.seat-booked)"));
             const selectedIds = Array.from(document.querySelectorAll(".seat.seat-selected")).map(s => s.dataset.id);

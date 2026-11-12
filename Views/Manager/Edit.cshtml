@@ -1,6 +1,6 @@
-﻿@model CinemaManagement.ViewModel.MovieFormViewModel
+@model CinemaManagement.ViewModel.MovieFormViewModel
 @{
-    ViewData["Title"] = "Chỉnh sửa phim";
+    ViewData["Title"] = "Ch?nh s?a phim";
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -108,7 +108,7 @@
 <div class="form-wrapper">
     <div class="custom-card">
         <div class="custom-header">
-            <h3><i class="bi bi-pencil-square"></i> Chỉnh sửa phim</h3>
+            <h3><i class="bi bi-pencil-square"></i> Ch?nh s?a phim</h3>
         </div>
         <div class="p-4">
             @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.SelectMany(v => v.Errors).Any())
@@ -122,50 +122,50 @@
             }
 
             <form asp-action="Edit" method="post" enctype="multipart/form-data">
-                @* QUAN TRỌNG: Cần có trường này để không bị lỗi 404/NotFound *@
+                @* QUAN TR?NG: C?n c� tru?ng n�y d? kh�ng b? l?i 404/NotFound *@
                 <input type="hidden" asp-for="Movie.MovieId" />
 
-                @* Lưu lại các URL ảnh cũ nếu người dùng không upload file mới *@
+                @* Luu l?i c�c URL ?nh cu n?u ngu?i d�ng kh�ng upload file m?i *@
                 <input type="hidden" asp-for="Movie.PosterUrl" />
                 <input type="hidden" asp-for="Movie.BannerUrl" />
 
                 <div class="mb-3">
-                    <label asp-for="Movie.Title" class="form-label">🎬 Tên phim</label>
-                    <input asp-for="Movie.Title" class="form-control" placeholder="Nhập tên phim..." />
+                    <label asp-for="Movie.Title" class="form-label">?? T�n phim</label>
+                    <input asp-for="Movie.Title" class="form-control" placeholder="Nh?p t�n phim..." />
                     <span asp-validation-for="Movie.Title" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Movie.Description" class="form-label">📝 Mô tả phim</label>
-                    <textarea asp-for="Movie.Description" class="form-control" placeholder="Nhập mô tả phim..." rows="4"></textarea>
+                    <label asp-for="Movie.Description" class="form-label">?? M� t? phim</label>
+                    <textarea asp-for="Movie.Description" class="form-control" placeholder="Nh?p m� t? phim..." rows="4"></textarea>
                     <span asp-validation-for="Movie.Description" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Movie.Duration" class="form-label">⏱ Thời lượng (phút)</label>
-                    <input asp-for="Movie.Duration" class="form-control" placeholder="Nhập thời lượng..." />
+                    <label asp-for="Movie.Duration" class="form-label">? Th?i lu?ng (ph�t)</label>
+                    <input asp-for="Movie.Duration" class="form-control" placeholder="Nh?p th?i lu?ng..." />
                     <span asp-validation-for="Movie.Duration" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">🖼 Poster (3:4)</label>
+                    <label class="form-label">?? Poster (3:4)</label>
                     <input asp-for="PosterFile" type="file" class="form-control" accept="image/*" id="posterFileInput" />
                     <div class="preview-wrapper preview-3x4">
-                        <img id="posterPreview" src="@Model.Movie?.PosterUrl" alt="Poster Preview" />
+                        <img loading="lazy" id="posterPreview" src="@Model.Movie?.PosterUrl" alt="Poster Preview" />
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">🎞 Banner (16:9)</label>
+                    <label class="form-label">?? Banner (16:9)</label>
                     <input asp-for="BannerFile" type="file" class="form-control" accept="image/*" id="bannerFileInput" />
                     <div class="preview-wrapper preview-16x9">
-                        <img id="bannerPreview" src="@Model.Movie?.BannerUrl" alt="Banner Preview" />
+                        <img loading="lazy" id="bannerPreview" src="@Model.Movie?.BannerUrl" alt="Banner Preview" />
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Movie.VideoUrl" class="form-label">🎥 URL Video (Youtube)</label>
-                    <input asp-for="Movie.VideoUrl" class="form-control" placeholder="Nhập URL video..." id="videoInput" />
+                    <label asp-for="Movie.VideoUrl" class="form-label">?? URL Video (Youtube)</label>
+                    <input asp-for="Movie.VideoUrl" class="form-control" placeholder="Nh?p URL video..." id="videoInput" />
                     <div class="preview-wrapper preview-16x9 mt-2">
                         <iframe id="videoPreview"
                                 src="@Model.Movie?.VideoUrl"
@@ -177,13 +177,13 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Movie.ReleaseDate" class="form-label">📅 Ngày phát hành</label>
+                    <label asp-for="Movie.ReleaseDate" class="form-label">?? Ng�y ph�t h�nh</label>
                     <input asp-for="Movie.ReleaseDate" class="form-control" type="date" />
                     <span asp-validation-for="Movie.ReleaseDate" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">🎭 Thể loại</label>
+                    <label class="form-label">?? Th? lo?i</label>
                     <div class="d-flex flex-wrap gap-3">
                         @foreach (var genre in Model.Genres)
                         {
@@ -198,10 +198,10 @@
 
                 <div class="d-flex justify-content-between mt-4">
                     <button type="submit" class="btn btn-red px-4">
-                        <i class="bi bi-save"></i> Lưu
+                        <i class="bi bi-save"></i> Luu
                     </button>
                     <a asp-action="Index" class="btn btn-outline-light px-4">
-                        <i class="bi bi-arrow-left"></i> Quay lại
+                        <i class="bi bi-arrow-left"></i> Quay l?i
                     </a>
                 </div>
             </form>
@@ -211,10 +211,10 @@
                 <hr class="my-4" />
                 <div class="text-end">
                     <a asp-controller="Showtimes" asp-action="Create" asp-route-movieId="@Model.Movie.MovieId" class="btn btn-outline-success me-2 px-4">
-                        <i class="bi bi-plus-circle"></i> Thêm suất chiếu mới
+                        <i class="bi bi-plus-circle"></i> Th�m su?t chi?u m?i
                     </a>
                     <a asp-controller="Showtimes" asp-action="Index" asp-route-movieId="@Model.Movie.MovieId" class="btn btn-outline-primary px-4">
-                        <i class="bi bi-film"></i> Quản lý suất chiếu
+                        <i class="bi bi-film"></i> Qu?n l� su?t chi?u
                     </a>
                 </div>
             }

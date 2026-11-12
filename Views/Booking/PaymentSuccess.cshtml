@@ -1,27 +1,27 @@
-﻿@using CinemaManagement.ViewModel
+@using CinemaManagement.ViewModel
 @model PaymentSuccessViewModel
 
 @{
-    ViewData["Title"] = "Thanh toán thành công";
+    ViewData["Title"] = "Thanh to�n th�nh c�ng";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-cinema section">
     <div class="card p-5 text-center shadow-3">
 
-        <h2 class="display-3 text-success mb-3">🎉 Thanh toán thành công!</h2>
-        <p class="lead">Dưới đây là thông tin vé của bạn:</p>
+        <h2 class="display-3 text-success mb-3">?? Thanh to�n th�nh c�ng!</h2>
+        <p class="lead">Du?i d�y l� th�ng tin v� c?a b?n:</p>
 
         <hr class="my-4" />
 
         @if (!string.IsNullOrEmpty(Model.QrCodeBase64))
         {
-            <h4 class="heading-3 mb-3">📱 Mã QR vé</h4>
-            <img src="data:image/png;base64,@Model.QrCodeBase64"
+            <h4 class="heading-3 mb-3">?? M� QR v�</h4>
+            <img loading="lazy" src="data:image/png;base64,@Model.QrCodeBase64"
                  class="img-fluid mb-4" style="max-width:250px" />
         }
 
-        <h4 class="heading-3 mb-3">🎫 Chi tiết vé</h4>
+        <h4 class="heading-3 mb-3">?? Chi ti?t v�</h4>
 
         @if (Model.Tickets != null && Model.Tickets.Any())
         {
@@ -29,23 +29,23 @@
             {
                 <div class="card p-3 mb-3 text-start">
                     <p><strong>Phim:</strong> @ticket.Showtime?.Movie?.Title </p>
-                    <p><strong>Thành phố:</strong> @ticket.Seat?.Room?.Theater?.City</p>
-                    <p><strong>Rạp:</strong> @ticket.Seat?.Room?.Theater?.Name </p>
-                    <p><strong>Phòng:</strong> @ticket.Seat?.Room?.Name </p>
-                    <p><strong>Ghế:</strong> @ticket.Seat?.SeatNumber </p>
-                    <p><strong>Ngày chiếu:</strong> @(ticket.Showtime?.StartTime.ToString("dd/MM/yyyy") )</p>
-                    <p><strong>Giờ chiếu:</strong> @(ticket.Showtime?.StartTime.ToString("HH:mm"))</p>
-                    <p><strong>Người mua:</strong> @ticket.User?.FullName </p>
-                    <p><strong>Giá vé:</strong> @ticket.Price.ToString("#,##0")</p>
+                    <p><strong>Th�nh ph?:</strong> @ticket.Seat?.Room?.Theater?.City</p>
+                    <p><strong>R?p:</strong> @ticket.Seat?.Room?.Theater?.Name </p>
+                    <p><strong>Ph�ng:</strong> @ticket.Seat?.Room?.Name </p>
+                    <p><strong>Gh?:</strong> @ticket.Seat?.SeatNumber </p>
+                    <p><strong>Ng�y chi?u:</strong> @(ticket.Showtime?.StartTime.ToString("dd/MM/yyyy") )</p>
+                    <p><strong>Gi? chi?u:</strong> @(ticket.Showtime?.StartTime.ToString("HH:mm"))</p>
+                    <p><strong>Ngu?i mua:</strong> @ticket.User?.FullName </p>
+                    <p><strong>Gi� v�:</strong> @ticket.Price.ToString("#,##0")</p>
                 </div>
             }
         }
         else
         {
-            <p class="text-muted">Không tìm thấy vé.</p>
+            <p class="text-muted">Kh�ng t�m th?y v�.</p>
         }
 
-        <a href="/" class="btn btn-primary btn-pill mt-4 px-5">⏪ Quay lại trang chủ</a>
+        <a href="/" class="btn btn-primary btn-pill mt-4 px-5">? Quay l?i trang ch?</a>
     </div>
 </div>
 

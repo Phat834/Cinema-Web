@@ -125,7 +125,7 @@
 
                 const previewImage = document.getElementById('preview-image');
                 if (imageInput.value) {
-                    previewImage.innerHTML = `<img src="${imageInput.value}" class="card-img-top" style="height: 150px; object-fit: cover;" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image fa-2x text-muted\\'></i>'">`;
+                    previewImage.innerHTML = `<img loading="lazy" src="${imageInput.value}" class="card-img-top" style="height: 150px; object-fit: cover;" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image fa-2x text-muted\\'></i>'">`;
                 } else {
                     previewImage.innerHTML = '<i class="fas fa-image fa-2x text-muted"></i>';
                 }

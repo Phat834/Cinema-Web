@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @model CinemaManagement.Models.Movie
 
 @{
@@ -69,7 +69,7 @@
         background: var(--surface-hover);
         color: var(--text-primary);
         text-align: center;
-        transition: all var(--duration-1) var(--ease-standard);
+        transition: background-color var(--duration-1) var(--ease-standard), border-color var(--duration-1) var(--ease-standard), color var(--duration-1) var(--ease-standard);
         flex-shrink: 0;
     }
 
@@ -102,7 +102,7 @@
         color: var(--action-primary);
         font-weight: 600;
         text-decoration: none;
-        transition: all var(--duration-1) var(--ease-standard);
+        transition: background-color var(--duration-1) var(--ease-standard), border-color var(--duration-1) var(--ease-standard), color var(--duration-1) var(--ease-standard);
     }
 
     .showtime-button:hover {
@@ -136,17 +136,17 @@
 
 <div class="container-cinema section">
     <div class="movie-grid" style="grid-template-columns: 1fr; gap: var(--gap-section);">
-        @* BÊN TRÁI: POSTER & THÔNG TIN *@
+        @* B�N TR�I: POSTER & TH�NG TIN *@
         <div class="card card-interactive" style="max-width: 380px; margin-inline: auto;">
             <div class="movie-poster-container">
-                <img src="@Model.PosterUrl" class="w-100 object-fit-cover" style="height: 500px;" alt="@Model.Title" />
+                <img loading="lazy" src="@Model.PosterUrl" class="w-100 object-fit-cover" style="height: 500px;" alt="@Model.Title" />
             </div>
 
             <div class="main-card p-4">
-                <h4 class="text-center fw-bold mb-3 text-brand">🎬 @Model.Title</h4>
+                <h4 class="text-center fw-bold mb-3 text-brand">?? @Model.Title</h4>
                 <p class="text-muted text-center mb-2">
-                    <strong>Thời lượng:</strong> @Model.Duration phút |
-                    <strong>Ngày khởi chiếu:</strong> @Model.ReleaseDate.ToString("dd/MM/yyyy")
+                    <strong>Th?i lu?ng:</strong> @Model.Duration ph�t |
+                    <strong>Ng�y kh?i chi?u:</strong> @Model.ReleaseDate.ToString("dd/MM/yyyy")
                 </p>
                 <div class="text-center mb-3">
                     @if (Model.MovieGenres != null)
@@ -159,7 +159,7 @@
                 </div>
 
                 <div class="text-center border-top pt-3">
-                    <p class="text-warning fs-4 mb-1">⭐ @Model.Rating / 10</p>
+                    <p class="text-warning fs-4 mb-1">? @Model.Rating / 10</p>
                     <form method="post" asp-action="RateMovie" asp-controller="Movies" class="d-inline-block">
                         <input type="hidden" name="movieId" value="@Model.MovieId" />
                         <input type="hidden" id="selectedRating" name="rating" value="0" />
@@ -169,7 +169,7 @@
                                 <span class="star" data-value="@i">&#9733;</span>
                             }
                         </div>
-                        <button type="submit" class="btn btn-outline-danger btn-sm">Gửi đánh giá</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">G?i d�nh gi�</button>
                     </form>
                 </div>
             </div>
@@ -184,15 +184,15 @@
             {
                 <div class="text-center mt-3">
                     <button id="buyTicketBtn" class="btn btn-danger btn-lg w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#showtimeModal">
-                        <i class="bi bi-ticket-fill"></i> MUA VÉ NGAY
+                        <i class="bi bi-ticket-fill"></i> MUA V� NGAY
                     </button>
                 </div>
             }
         </div>
 
-        @* BÊN PHẢI: TRAILER & MÔ TẢ *@
+        @* B�N PH?I: TRAILER & M� T? *@
         <div class="card card-interactive">
-            @* Sửa đổi quan trọng: Sử dụng Model.VideoUrl và class ratio 16:9 giống Manager *@
+            @* S?a d?i quan tr?ng: S? d?ng Model.VideoUrl v� class ratio 16:9 gi?ng Manager *@
             <div class="ratio ratio-16x9">
                 <iframe src="@Model.VideoUrl"
                         title="Trailer"
@@ -202,24 +202,24 @@
                 </iframe>
             </div>
             <div class="p-4">
-                <h5 class="fw-bold text-primary mb-3">📝 Mô tả phim</h5>
+                <h5 class="fw-bold text-primary mb-3">?? M� t? phim</h5>
                 <p class="text-secondary">@Model.Description</p>
             </div>
         </div>
     </div>
 </div>
 
-@* MODAL CHỌN SUẤT CHIẾU GIỮ NGUYÊN *@
+@* MODAL CH?N SU?T CHI?U GI? NGUY�N *@
 <div class="modal fade" id="showtimeModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">CHỌN SUẤT CHIẾU</h5>
+                <h5 class="modal-title">CH?N SU?T CHI?U</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <div class="booking-filters mb-4">
-                    <h5 class="text-white mb-3"><i class="bi bi-geo-alt-fill"></i> Chọn ngày & Thành phố</h5>
+                    <h5 class="text-white mb-3"><i class="bi bi-geo-alt-fill"></i> Ch?n ng�y & Th�nh ph?</h5>
                     <div class="date-scroller mb-3 d-flex gap-2">
                         @foreach (var d in dates)
                         {
@@ -237,7 +237,7 @@
                     </div>
                 </div>
                 <div id="showtimeListContainer">
-                    <div class="text-center text-muted">Vui lòng chọn ngày và thành phố để xem suất chiếu.</div>
+                    <div class="text-center text-muted">Vui l�ng ch?n ng�y v� th�nh ph? d? xem su?t chi?u.</div>
                 </div>
             </div>
         </div>
@@ -251,7 +251,7 @@
             const container = $("#showtimeListContainer");
             container.empty();
             if (data.length === 0) {
-                container.html('<div class="text-center text-danger">Không có suất chiếu nào.</div>');
+                container.html('<div class="text-center text-danger">Kh�ng c� su?t chi?u n�o.</div>');
                 return;
             }
             const grouped = data.reduce((acc, item) => {

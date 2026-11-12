@@ -1,6 +1,6 @@
-﻿@model IEnumerable<CinemaManagement.Models.Theater>
+@model IEnumerable<CinemaManagement.Models.Theater>
 @{
-    ViewData["Title"] = "Danh sách rạp chiếu";
+    ViewData["Title"] = "Danh s�ch r?p chi?u";
     var cities = Model.Select(t => t.City).Distinct().OrderBy(c => c).ToList();
     var query = Context.Request.Query;
     var selectedCity = query["city"].FirstOrDefault() ?? cities.FirstOrDefault();
@@ -122,10 +122,10 @@
         align-items: center;
         gap: 10px;
         box-shadow: 0 0 0 rgba(255, 77, 109, 0.6);
-        transition: all 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         border: none;
     }
-    /*Nút thêm rạp*/
+    /*N�t th�m r?p*/
         .btn-cgv-add:hover {
             color: #fff;
             transform: translateY(-3px) scale(1.02);
@@ -138,7 +138,7 @@
             transform: scale(0.97);
         }
 
-        /* Icon animation nhẹ */
+        /* Icon animation nh? */
         .btn-cgv-add i {
             font-size: 1.2rem;
             transition: transform 0.3s ease;
@@ -149,7 +149,7 @@
         }
 </style>
 
-<h2 class="mb-4"><i class="bi bi-building"></i> Danh sách rạp chiếu</h2>
+<h2 class="mb-4"><i class="bi bi-building"></i> Danh s�ch r?p chi?u</h2>
 
 <div class="city-filter-bar">
     @foreach (var city in cities)
@@ -161,7 +161,7 @@
 <div id="theaterList">
     @if (!filteredTheaters.Any())
     {
-        <div class="alert alert-warning">Không có rạp nào trong thành phố này.</div>
+        <div class="alert alert-warning">Kh�ng c� r?p n�o trong th�nh ph? n�y.</div>
     }
     else
     {
@@ -172,27 +172,27 @@
                     <i class="bi bi-film"></i> @theater.Name
                     @if (theater.IsActive)
                     {
-                        <span class="badge badge-status now-showing">Đang hoạt động</span>
+                        <span class="badge badge-status now-showing">�ang ho?t d?ng</span>
                     }
                     else
                     {
-                        <span class="badge badge-status coming-soon">Ngừng hoạt động</span>
+                        <span class="badge badge-status coming-soon">Ng?ng ho?t d?ng</span>
                     }
                 </div>
-                <div class="theater-city"><i class="bi bi-geo-alt"></i> Thành phố: @theater.City</div>
-                <div class="theater-location"><i class="bi bi-pin-map"></i> Địa điểm: @theater.Location</div>
+                <div class="theater-city"><i class="bi bi-geo-alt"></i> Th�nh ph?: @theater.City</div>
+                <div class="theater-location"><i class="bi bi-pin-map"></i> �?a di?m: @theater.Location</div>
                 <div class="action-btns">
-                    <a asp-action="Details" asp-route-id="@theater.TheaterId" class="btn-details"><i class="bi bi-info-circle"></i> Chi tiết</a>
-                    <a asp-action="Edit" asp-route-id="@theater.TheaterId" class="btn-edit"><i class="bi bi-pencil"></i> Sửa</a>
+                    <a asp-action="Details" asp-route-id="@theater.TheaterId" class="btn-details"><i class="bi bi-info-circle"></i> Chi ti?t</a>
+                    <a asp-action="Edit" asp-route-id="@theater.TheaterId" class="btn-edit"><i class="bi bi-pencil"></i> S?a</a>
                     @if (theater.IsActive)
                     {
-                        <a asp-action="Disable" asp-route-id="@theater.TheaterId" class="btn-delete"><i class="bi bi-power"></i> Ngừng hoạt động</a>
+                        <a asp-action="Disable" asp-route-id="@theater.TheaterId" class="btn-delete"><i class="bi bi-power"></i> Ng?ng ho?t d?ng</a>
                     }
                     else
                     {
-                        <a asp-action="Enable" asp-route-id="@theater.TheaterId" class="btn-delete" style="background: var(--state-success);"><i class="bi bi-play-circle"></i> Bật lại</a>
+                        <a asp-action="Enable" asp-route-id="@theater.TheaterId" class="btn-delete" style="background: var(--state-success);"><i class="bi bi-play-circle"></i> B?t l?i</a>
                     }
-                    <a asp-action="CreateRoom" asp-route-theaterId="@theater.TheaterId" class="btn-add-room"><i class="bi bi-plus-square"></i> Thêm phòng</a>
+                    <a asp-action="CreateRoom" asp-route-theaterId="@theater.TheaterId" class="btn-add-room"><i class="bi bi-plus-square"></i> Th�m ph�ng</a>
                 </div>
             </div>
         }
@@ -201,7 +201,7 @@
 
 <div class="mt-4 text-center">
     <a asp-action="Create" class="btn-cgv-add">
-        <i class="bi bi-plus-circle"></i> Thêm rạp mới
+        <i class="bi bi-plus-circle"></i> Th�m r?p m?i
     </a>
 </div>
 

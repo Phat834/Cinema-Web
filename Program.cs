@@ -44,6 +44,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // Cấu hình Session
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);

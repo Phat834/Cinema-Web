@@ -544,8 +544,8 @@ a:focus-visible { outline: none; box-shadow: var(--shadow-focus); border-radius:
   position: fixed;
   inset: 0;
   background: oklch(0 0 0 / 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   z-index: 1040;
   opacity: 0;
   visibility: hidden;
@@ -654,8 +654,8 @@ a:focus-visible { outline: none; box-shadow: var(--shadow-focus); border-radius:
   z-index: 1030;
   background: var(--surface-overlay);
   border-bottom: 1px solid var(--color-border-0);
-  backdrop-filter: saturate(180%) blur(12px);
-  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   transition: box-shadow var(--duration-2) var(--ease-standard);
 }
 
@@ -918,7 +918,7 @@ a:focus-visible { outline: none; box-shadow: var(--shadow-focus); border-radius:
   border: 1px solid var(--color-border-0);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--duration-2) var(--ease-standard);
+  transition: transform var(--duration-2) var(--ease-standard), box-shadow var(--duration-2) var(--ease-standard), background-color var(--duration-2) var(--ease-standard), border-color var(--duration-2) var(--ease-standard);
   min-height: 44px;
 }
 

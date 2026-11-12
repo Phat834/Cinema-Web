@@ -1,4 +1,4 @@
-﻿@model CinemaManagement.Models.Movie
+@model CinemaManagement.Models.Movie
 
 @{
     ViewData["Title"] = Model.Title;
@@ -10,7 +10,7 @@
 @if (!string.IsNullOrEmpty(Model.BannerUrl))
 {
     <div class="position-relative mb-5" style="height:420px; overflow:hidden;">
-        <img src="@Model.BannerUrl" class="w-100 h-100"
+        <img loading="lazy" src="@Model.BannerUrl" class="w-100 h-100"
              style="object-fit:cover; filter:brightness(60%);" />
 
         <div class="position-absolute top-0 start-0 w-100 h-100"
@@ -23,7 +23,7 @@
                 @Model.Title
             </h1>
             <div style="font-size:1.3rem; color:#ffc107;">
-                ⭐ @Model.Rating / 10
+                ? @Model.Rating / 10
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
 
         <!-- POSTER -->
         <div class="col-md-4 text-center">
-            <img src="@Model.PosterUrl"
+            <img loading="lazy" src="@Model.PosterUrl"
                  class="img-fluid rounded-4 shadow-lg"
                  style="max-height:520px; object-fit:cover;" />
         </div>
@@ -47,18 +47,18 @@
 
                 <h4 class="text-uppercase fw-bold mb-3"
                     style="color:#e50914;">
-                    Nội dung phim
+                    N?i dung phim
                 </h4>
 
                 <p class="fs-5 text-light">@Model.Description</p>
 
                 <div class="row mt-4 text-light fs-5">
-                    <div class="col-md-6 mb-2">⏱ @Model.Duration phút</div>
+                    <div class="col-md-6 mb-2">? @Model.Duration ph�t</div>
                     <div class="col-md-6 mb-2">
-                        📅 @Model.ReleaseDate.ToString("dd/MM/yyyy")
+                        ?? @Model.ReleaseDate.ToString("dd/MM/yyyy")
                     </div>
                     <div class="col-12">
-                        🎭 @string.Join(", ", Model.MovieGenres.Select(g => g.Genre.Name))
+                        ?? @string.Join(", ", Model.MovieGenres.Select(g => g.Genre.Name))
                     </div>
                 </div>
             </div>
@@ -82,12 +82,12 @@
         <div class="col-12 d-flex gap-3 mt-5">
             <a asp-action="Edit" asp-route-id="@Model.MovieId"
                class="btn btn-danger btn-lg px-5 rounded-pill">
-                ✏️ Chỉnh sửa
+                ?? Ch?nh s?a
             </a>
 
             <a asp-action="Index"
                class="btn btn-dark btn-lg px-5 rounded-pill">
-                ⬅ Danh sách phim
+                ? Danh s�ch phim
             </a>
         </div>
 

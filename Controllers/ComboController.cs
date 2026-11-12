@@ -19,7 +19,7 @@ namespace CinemaManagement.Controllers
         // GET: Combo
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Combos.ToListAsync());
+            return View(await _context.Combos.AsNoTracking().ToListAsync());
         }
 
         // GET: Combo/Create
@@ -99,7 +99,7 @@ namespace CinemaManagement.Controllers
                 return NotFound();
             }
 
-            var combo = await _context.Combos
+            var combo = await _context.Combos.AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ComboId == id);
             if (combo == null)
             {
@@ -126,7 +126,7 @@ namespace CinemaManagement.Controllers
 
         private bool ComboExists(int id)
         {
-            return _context.Combos.Any(e => e.ComboId == id);
+            return _context.Combos.AsNoTracking().Any(e => e.ComboId == id);
         }
     }
 }

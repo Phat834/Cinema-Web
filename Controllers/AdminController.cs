@@ -15,90 +15,83 @@ public class AdminController : Controller
 
     public IActionResult RevenueStats()
     {
-        // Default: last 30 days
+        var today = DateTime.UtcNow.Date;
         var vm = new RevenueStatsViewModel
         {
-            FromDate = DateTime.UtcNow.AddDays(-30),
-            ToDate = DateTime.UtcNow,
+            FromDate = today.AddDays(-30),
+            ToDate = today,
             PaymentMethod = "All"
         };
-
-        vm = GetRevenueStats(vm.FromDate.Value, vm.ToDate.Value, vm.PaymentMethod);
-
+        vm = GetRevenueStats(vm.FromDate!.Value, vm.ToDate!.Value, vm.PaymentMethod);
         return View(vm);
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult RevenueStats(DateTime? fromDate, DateTime? toDate, string paymentMethod)
     {
-        if (!fromDate.HasValue) fromDate = DateTime.UtcNow.AddMonths(-1);
-        if (!toDate.HasValue) toDate = DateTime.UtcNow;
-        if (string.IsNullOrEmpty(paymentMethod)) paymentMethod = "All";
-
-        var vm = GetRevenueStats(fromDate.Value, toDate.Value, paymentMethod);
-
+        var today = DateTime.UtcNow.Date;
+        var from = (fromDate ?? today.AddMonths(-1)).Date;
+        var to = (toDate ?? today).Date;
+        if (string.IsNullOrWhiteSpace(paymentMethod)) paymentMethod = "All";
+        var vm = GetRevenueStats(from, to, paymentMethod);
         return View(vm);
     }
 
     private RevenueStatsViewModel GetRevenueStats(DateTime from, DateTime to, string paymentMethod)
     {
+        var fromInclusive = from.Date;
+        var toExclusive = to.Date.AddDays(1);
+
         var ticketsQuery = _context.Tickets
-            .Include(t => t.Showtime)
-                .ThenInclude(s => s.Movie)
-            .Include(t => t.Seat)
-                .ThenInclude(s => s.Room)
-                    .ThenInclude(r => r.Theater)
-            .Where(t => t.IsPaid && t.BookingTime >= from && t.BookingTime <= to);
+            .AsNoTracking()
+            .Where(t => t.IsPaid && t.BookingTime >= fromInclusive && t.BookingTime < toExclusive);
 
-        if (paymentMethod == "Momo")
-        {
+        if (string.Equals(paymentMethod, "Momo", StringComparison.OrdinalIgnoreCase))
             ticketsQuery = ticketsQuery.Where(t => t.PaymentMethod == "Momo");
-        }
-        else if (paymentMethod == "Cash")
-        {
+        else if (string.Equals(paymentMethod, "Cash", StringComparison.OrdinalIgnoreCase))
             ticketsQuery = ticketsQuery.Where(t => t.PaymentMethod == "Cash");
-        }
 
-        var tickets = ticketsQuery.ToList();
+        var tickets = ticketsQuery
+            .Select(t => new
+            {
+                t.Price,
+                MovieTitle = t.Showtime.Movie.Title,
+                TheaterName = t.Seat.Room.Theater.Name,
+                ShowtimeId = t.Showtime.ShowtimeId,
+                ShowtimeStart = t.Showtime.StartTime
+            })
+            .ToList();
 
-        var vm = new RevenueStatsViewModel
+        return new RevenueStatsViewModel
         {
-            FromDate = from,
-            ToDate = to,
+            FromDate = fromInclusive,
+            ToDate = to.Date,
             PaymentMethod = paymentMethod,
             TotalRevenue = tickets.Sum(t => t.Price),
             TotalTickets = tickets.Count,
             ByMovie = tickets
-                .GroupBy(t => t.Showtime.Movie.Title)
-                .Select(g => new RevenueByMovie
-                {
-                    MovieTitle = g.Key,
-                    TicketsSold = g.Count(),
-                    Revenue = g.Sum(t => t.Price)
-                })
+                .GroupBy(t => t.MovieTitle)
+                .Select(g => new RevenueByMovie { MovieTitle = g.Key, TicketsSold = g.Count(), Revenue = g.Sum(t => t.Price) })
+                .OrderByDescending(x => x.Revenue)
                 .ToList(),
             ByTheater = tickets
-                .GroupBy(t => t.Seat.Room.Theater.Name)
-                .Select(g => new RevenueByTheater
-                {
-                    TheaterName = g.Key,
-                    TicketsSold = g.Count(),
-                    Revenue = g.Sum(t => t.Price)
-                })
+                .GroupBy(t => t.TheaterName)
+                .Select(g => new RevenueByTheater { TheaterName = g.Key, TicketsSold = g.Count(), Revenue = g.Sum(t => t.Price) })
+                .OrderByDescending(x => x.Revenue)
                 .ToList(),
             ByShowtime = tickets
-                .GroupBy(t => new { t.Showtime.ShowtimeId, t.Showtime.Movie.Title, t.Seat.Room.Theater.Name, t.Showtime.StartTime })
+                .GroupBy(t => new { t.ShowtimeId, t.MovieTitle, t.TheaterName, t.ShowtimeStart })
                 .Select(g => new RevenueByShowtime
                 {
-                    MovieTitle = g.Key.Title,
-                    TheaterName = g.Key.Name,
-                    Showtime = g.Key.StartTime,
+                    MovieTitle = g.Key.MovieTitle,
+                    TheaterName = g.Key.TheaterName,
+                    Showtime = g.Key.ShowtimeStart,
                     TicketsSold = g.Count(),
                     Revenue = g.Sum(t => t.Price)
                 })
+                .OrderByDescending(x => x.Showtime)
                 .ToList()
         };
-
-        return vm;
     }
 }
