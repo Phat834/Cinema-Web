@@ -1,81 +1,86 @@
-@using CinemaManagement.ViewModel
+﻿@using CinemaManagement.ViewModel
 @model PaymentSuccessViewModel
 
 @{
-    ViewData["Title"] = "Thanh to�n th�nh c�ng";
+    ViewData["Title"] = "Đặt vé thành công";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-cinema section">
-    <div class="card p-5 text-center shadow-3">
+<div class="booking-result-wrapper">
+    <div class="success-box card p-5 text-center shadow-3 animate__animated animate__fadeIn">
 
-        <h2 class="display-3 text-success mb-3">?? Thanh to�n th�nh c�ng!</h2>
-        <p class="lead">Du?i d�y l� th�ng tin v� c?a b?n:</p>
+        <div class="success-icon mb-4">
+            <i class="fas fa-check-circle fa-5x text-success"></i>
+        </div>
 
-        <hr class="my-4" />
+        <h1 class="display-3 text-success mb-3">Bạn đã đặt vé thành công!</h1>
 
-        @if (!string.IsNullOrEmpty(Model.QrCodeBase64))
-        {
-            <h4 class="heading-3 mb-3">?? M� QR v�</h4>
-            <img loading="lazy" src="data:image/png;base64,@Model.QrCodeBase64"
-                 class="img-fluid mb-4" style="max-width:250px" />
-        }
+        <div class="alert alert-success border-0 shadow-sm mb-4" role="alert">
+            <i class="fas fa-envelope me-2"></i>
+            <strong>Thông tin chi tiết về vé và mã QR soát vé đã được gửi tới địa chỉ Gmail của bạn. Vui lòng kiểm tra hộp thư email để xuất trình mã QR cho nhân viên khi đến rạp.</strong>
+        </div>
 
-        <h4 class="heading-3 mb-3">?? Chi ti?t v�</h4>
+        <p class="text-muted mb-4">Mã đơn: <strong class="text-light">@Model.OrderId</strong></p>
 
-        @if (Model.Tickets != null && Model.Tickets.Any())
-        {
-            @foreach (var ticket in Model.Tickets)
-            {
-                <div class="card p-3 mb-3 text-start">
-                    <p><strong>Phim:</strong> @ticket.Showtime?.Movie?.Title </p>
-                    <p><strong>Th�nh ph?:</strong> @ticket.Seat?.Room?.Theater?.City</p>
-                    <p><strong>R?p:</strong> @ticket.Seat?.Room?.Theater?.Name </p>
-                    <p><strong>Ph�ng:</strong> @ticket.Seat?.Room?.Name </p>
-                    <p><strong>Gh?:</strong> @ticket.Seat?.SeatNumber </p>
-                    <p><strong>Ng�y chi?u:</strong> @(ticket.Showtime?.StartTime.ToString("dd/MM/yyyy") )</p>
-                    <p><strong>Gi? chi?u:</strong> @(ticket.Showtime?.StartTime.ToString("HH:mm"))</p>
-                    <p><strong>Ngu?i mua:</strong> @ticket.User?.FullName </p>
-                    <p><strong>Gi� v�:</strong> @ticket.Price.ToString("#,##0")</p>
-                </div>
-            }
-        }
-        else
-        {
-            <p class="text-muted">Kh�ng t�m th?y v�.</p>
-        }
-
-        <a href="/" class="btn btn-primary btn-pill mt-4 px-5">? Quay l?i trang ch?</a>
+        <a href="/" class="btn btn-primary btn-pill px-5 btn-lg mt-2">
+            <i class="fas fa-home me-2"></i>Quay lại trang chủ
+        </a>
     </div>
 </div>
 
 @section Styles {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
-        .success-box {
-            max-width: 600px;
-            margin: auto;
-            background: var(--surface-elevated);
+        .booking-result-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 75vh;
+            padding: 2rem 1rem;
+            width: 100%;
         }
 
-        body {
-            background: var(--surface-canvas);
+        .success-box {
+            max-width: 520px;
+            margin: 0 auto;
+            background: var(--surface-elevated);
+            border-radius: var(--radius-xl);
         }
 
         .success-icon {
-            animation: pop 0.5s ease-in-out;
+            animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @@keyframes pop {
             0% {
-                transform: scale(0.8);
+                transform: scale(0.6);
                 opacity: 0;
             }
-
             100% {
                 transform: scale(1);
                 opacity: 1;
             }
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.15) !important;
+            border: 1px solid rgba(40, 167, 69, 0.3) !important;
+            color: #75d08a !important;
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            border: none;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.4);
         }
     </style>
 }
