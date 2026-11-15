@@ -104,10 +104,10 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Add Permissions-Policy header to avoid unrecognized feature errors
+// Add Permissions-Policy header (omit deprecated/unrecognized features like interest-cohort)
 app.Use(async (context, next) =>
 {
-    context.Response.Headers["Permissions-Policy"] = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()";
+    context.Response.Headers["Permissions-Policy"] = "accelerometer=(), camera=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
     await next();
 });
 

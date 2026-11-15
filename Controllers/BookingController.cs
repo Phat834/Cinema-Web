@@ -9,6 +9,8 @@ using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using CinemaManagement.ViewModel;
 using Newtonsoft.Json;
+using QRCoder;
+using System.Drawing.Imaging;
 
 namespace CinemaManagement.Controllers
 {
@@ -35,6 +37,17 @@ namespace CinemaManagement.Controllers
         }
 
         private DateTime ActiveHoldCutoffUtc() => DateTime.UtcNow.AddMinutes(-_reservationTimeout);
+
+        private string GenerateQrCodeBase64(string content)
+        {
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrData = qrGenerator.CreateQrCode(content, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new QRCode(qrData);
+            using var ms = new System.IO.MemoryStream();
+            using var bitmap = qrCode.GetGraphic(20);
+            bitmap.Save(ms, ImageFormat.Png);
+            return "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+        }
 
         [AllowAnonymous]
         public async Task<IActionResult> Index(int? movieId)
@@ -109,7 +122,6 @@ namespace CinemaManagement.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var cutoff = ActiveHoldCutoffUtc();
 
-            // Hủy/xóa đơn chờ thanh toán còn hạn của chính user (mỗi người chỉ giữ tối đa 1 đơn chưa thanh toán)
             var stalePending = await _context.Tickets
                 .Where(t => t.UserId == userId && !t.IsPaid && t.BookingTime >= cutoff)
                 .ToListAsync();
@@ -156,106 +168,133 @@ namespace CinemaManagement.Controllers
             return Json(new { success = true, redirectUrl = Url.Action("SelectCombos", new { orderId }) });
         }
 
-    public async Task<IActionResult> SelectCombos(string orderId)
-    {
-        if (string.IsNullOrEmpty(orderId)) return NotFound("OrderId không hợp lệ!");
-        var tickets = await _context.Tickets.AsNoTracking().Where(t => t.OrderId == orderId).ToListAsync();
-        if (!tickets.Any()) return NotFound("Không tìm thấy vé!");
-        var combos = await _context.Combos.AsNoTracking()
-            .Where(c => c.IsAvailable)
-            .Select(c => new ComboItem { Id = c.ComboId, Name = c.Name, Description = c.Description, Price = c.Price, ImageUrl = c.ImageUrl })
-            .ToListAsync();
-        return View(new ComboSelectionViewModel { OrderId = orderId, TicketTotal = tickets.Sum(t => t.Price), AvailableCombos = combos, ComboTotal = 0, GrandTotal = tickets.Sum(t => t.Price) });
-    }
-
-    [HttpPost]
-    public IActionResult SaveCombos([FromBody] ComboRequest req)
-    {
-        if (string.IsNullOrEmpty(req.OrderId) || req.SelectedCombos == null) return Json(new { success = false, error = "Dữ liệu không hợp lệ" });
-        HttpContext.Session.SetString($"Combos_{req.OrderId}", JsonConvert.SerializeObject(req.SelectedCombos));
-        HttpContext.Session.SetString($"ComboTotal_{req.OrderId}", req.ComboTotal.ToString());
-        return Json(new { success = true });
-    }
-
-    public async Task<IActionResult> Payment(string orderId)
-    {
-        if (string.IsNullOrEmpty(orderId)) return NotFound("OrderId không hợp lệ!");
-        var tickets = await _context.Tickets.AsNoTracking().Where(t => t.OrderId == orderId).ToListAsync();
-        if (!tickets.Any()) return NotFound("Không tìm thấy vé!");
-        decimal ticketTotal = tickets.Sum(t => t.Price); decimal comboTotal = 0;
-        var comboTotalStr = HttpContext.Session.GetString($"ComboTotal_{orderId}");
-        if (!string.IsNullOrEmpty(comboTotalStr)) decimal.TryParse(comboTotalStr, out comboTotal);
-        decimal grandTotal = ticketTotal + comboTotal;
-        HttpContext.Session.SetString("TotalAmount", ((long)grandTotal).ToString());
-        return View(new PaymentViewModel { OrderId = orderId, TicketTotal = ticketTotal, ComboTotal = comboTotal, GrandTotal = grandTotal });
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> GetMomoQRCode([FromBody] PaymentRequest req)
-    {
-        if (req == null || req.Amount <= 0) return BadRequest(new { success = false, error = "Dữ liệu không hợp lệ!" });
-        string qrUrl = await _momo.CreatePaymentRequestAsync(req.Amount, req.OrderId);
-        var tickets = await _context.Tickets.Where(t => t.OrderId == req.OrderId).ToListAsync();
-        foreach (var t in tickets) t.PaymentMethod = "Pending";
-        await _context.SaveChangesAsync();
-        return Ok(new { success = true, qrUrl });
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> MockMomoCheckout(string orderId, long amount)
-    {
-        if (string.IsNullOrEmpty(orderId)) return RedirectToAction("Index", "Movies");
-
-        var ticketsToPay = await _context.Tickets
-            .Where(t => t.OrderId == orderId && !t.IsPaid)
-            .Include(t => t.Seat)
-            .ToListAsync();
-
-        var paidAt = DateTime.UtcNow;
-        foreach (var t in ticketsToPay)
+        public async Task<IActionResult> SelectCombos(string orderId)
         {
-            t.IsPaid = true;
-            t.PaymentMethod = "Momo";
-            t.BookingTime = paidAt;
-            if (t.Seat != null) t.Seat.IsBooked = true;
-        }
-        await _context.SaveChangesAsync();
-
-        var tickets = await _context.Tickets.AsNoTracking()
-            .Where(t => t.OrderId == orderId && t.IsPaid)
-            .Include(t => t.User)
-            .Include(t => t.Seat).ThenInclude(s => s.Room).ThenInclude(r => r.Theater)
-            .Include(t => t.Showtime).ThenInclude(s => s.Movie)
-            .ToListAsync();
-
-        if (tickets.Any() && !string.IsNullOrEmpty(tickets.First().User?.Email))
-        {
-            var htmlContent = BookingHelper.BuildTicketEmailHtml(orderId, tickets);
-            try
-            {
-                await _email.SendTicketEmailAsync(tickets.First().User.Email, "Xác nhận đặt vé xem phim", htmlContent, orderId);
-            }
-            catch (Exception ex)
-            {
-                _log.LogError(ex, "Send email failed for OrderId {OrderId}", orderId);
-            }
+            if (string.IsNullOrEmpty(orderId)) return NotFound("OrderId không hợp lệ!");
+            var tickets = await _context.Tickets.AsNoTracking().Where(t => t.OrderId == orderId).ToListAsync();
+            if (!tickets.Any()) return NotFound("Không tìm thấy vé!");
+            var combos = await _context.Combos.AsNoTracking()
+                .Where(c => c.IsAvailable)
+                .Select(c => new ComboItem { Id = c.ComboId, Name = c.Name, Description = c.Description, Price = c.Price, ImageUrl = c.ImageUrl })
+                .ToListAsync();
+            return View(new ComboSelectionViewModel { OrderId = orderId, TicketTotal = tickets.Sum(t => t.Price), AvailableCombos = combos, ComboTotal = 0, GrandTotal = tickets.Sum(t => t.Price) });
         }
 
-        return RedirectToAction("PaymentSuccess", new { orderId });
-    }
-
-    [AllowAnonymous]
-    [HttpPost("/api/momo/notify")]
-    public async Task<IActionResult> MomoNotifyUrl()
-    {
-        using var reader = new StreamReader(Request.Body); var body = await reader.ReadToEndAsync();
-        var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(body);
-        if (data == null || !data.ContainsKey("orderId")) return BadRequest();
-        var orderId = data["orderId"];
-        var result = _momo.ProcessNotify(data);
-        if (result.IsSuccess)
+        [HttpPost]
+        public IActionResult SaveCombos([FromBody] ComboRequest req)
         {
-            var ticketsToPay = await _context.Tickets.Where(t => t.OrderId == orderId && !t.IsPaid).Include(t => t.Seat).ToListAsync();
+            if (string.IsNullOrEmpty(req.OrderId) || req.SelectedCombos == null) return Json(new { success = false, error = "Dữ liệu không hợp lệ" });
+            HttpContext.Session.SetString($"Combos_{req.OrderId}", JsonConvert.SerializeObject(req.SelectedCombos));
+            HttpContext.Session.SetString($"ComboTotal_{req.OrderId}", req.ComboTotal.ToString());
+            return Json(new { success = true });
+        }
+
+        public async Task<IActionResult> Payment(string orderId)
+        {
+            if (string.IsNullOrEmpty(orderId)) return NotFound("OrderId không hợp lệ!");
+            var tickets = await _context.Tickets.AsNoTracking().Where(t => t.OrderId == orderId).ToListAsync();
+            if (!tickets.Any()) return NotFound("Không tìm thấy vé!");
+            decimal ticketTotal = tickets.Sum(t => t.Price); decimal comboTotal = 0;
+            var comboTotalStr = HttpContext.Session.GetString($"ComboTotal_{orderId}");
+            if (!string.IsNullOrEmpty(comboTotalStr)) decimal.TryParse(comboTotalStr, out comboTotal);
+            decimal grandTotal = ticketTotal + comboTotal;
+            HttpContext.Session.SetString("TotalAmount", ((long)grandTotal).ToString());
+            return View(new PaymentViewModel { OrderId = orderId, TicketTotal = ticketTotal, ComboTotal = comboTotal, GrandTotal = grandTotal });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> QRPayment(string orderId, string method)
+        {
+            if (string.IsNullOrEmpty(orderId) || string.IsNullOrEmpty(method)) return RedirectToAction("Payment", new { orderId });
+
+            var validMethods = new[] { "MoMo", "ZaloPay", "ShopeePay" };
+            if (!validMethods.Contains(method)) return RedirectToAction("Payment", new { orderId });
+
+            var tickets = await _context.Tickets.AsNoTracking().Where(t => t.OrderId == orderId).ToListAsync();
+            if (!tickets.Any()) return RedirectToAction("Index", "Movies");
+
+            // Tính tổng tiền từ database thay vì phụ thuộc vào tham số URL
+            long totalAmount = (long)tickets.Sum(t => t.Price);
+
+            string payload = $"CINEMA_DEMO_PAY|METHOD:{method}|ORDER:{orderId}|AMOUNT:{totalAmount}";
+            string qrBase64 = GenerateQrCodeBase64(payload);
+            ViewBag.QRCodeBase64 = qrBase64;
+            ViewBag.OrderId = orderId;
+            ViewBag.Method = method;
+            ViewBag.TotalAmount = totalAmount;
+
+            return View(new QRPaymentViewModel
+            {
+                OrderId = orderId,
+                PaymentMethod = method,
+                Amount = totalAmount,
+                QrCodeImageUrl = qrBase64,
+                CountdownSeconds = 300
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmPayment(string orderId, string method)
+        {
+            if (string.IsNullOrEmpty(orderId) || string.IsNullOrEmpty(method))
+                return RedirectToAction("Payment", new { orderId });
+
+            var validMethods = new[] { "MoMo", "ZaloPay", "ShopeePay", "Cash" };
+            if (!validMethods.Contains(method))
+                return RedirectToAction("Payment", new { orderId });
+
+            var ticketsToPay = await _context.Tickets
+                .Where(t => t.OrderId == orderId && !t.IsPaid)
+                .Include(t => t.Seat)
+                .ToListAsync();
+
+            if (!ticketsToPay.Any())
+                return RedirectToAction("Index", "Movies");
+
+            var paidAt = DateTime.UtcNow;
+            foreach (var t in ticketsToPay)
+            {
+                t.IsPaid = true;
+                t.PaymentMethod = method;
+                t.BookingTime = paidAt;
+                if (t.Seat != null) t.Seat.IsBooked = true;
+            }
+            await _context.SaveChangesAsync();
+
+            var tickets = await _context.Tickets.AsNoTracking()
+                .Where(t => t.OrderId == orderId && t.IsPaid)
+                .Include(t => t.User)
+                .Include(t => t.Seat).ThenInclude(s => s.Room).ThenInclude(r => r.Theater)
+                .Include(t => t.Showtime).ThenInclude(s => s.Movie)
+                .ToListAsync();
+
+            if (tickets.Any() && !string.IsNullOrEmpty(tickets.First().User?.Email))
+            {
+                var htmlContent = BookingHelper.BuildTicketEmailHtml(orderId, tickets);
+                try
+                {
+                    await _email.SendTicketEmailAsync(tickets.First().User.Email, "Xác nhận đặt vé xem phim", htmlContent, orderId);
+                }
+                catch (Exception ex)
+                {
+                    _log.LogError(ex, "Send email failed for OrderId {OrderId}", orderId);
+                }
+            }
+
+            return RedirectToAction("PaymentSuccess", new { orderId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MockMomoCheckout(string orderId, long amount)
+        {
+            if (string.IsNullOrEmpty(orderId)) return RedirectToAction("Index", "Movies");
+
+            var ticketsToPay = await _context.Tickets
+                .Where(t => t.OrderId == orderId && !t.IsPaid)
+                .Include(t => t.Seat)
+                .ToListAsync();
+
             var paidAt = DateTime.UtcNow;
             foreach (var t in ticketsToPay)
             {
@@ -265,61 +304,106 @@ namespace CinemaManagement.Controllers
                 if (t.Seat != null) t.Seat.IsBooked = true;
             }
             await _context.SaveChangesAsync();
+
+            var tickets = await _context.Tickets.AsNoTracking()
+                .Where(t => t.OrderId == orderId && t.IsPaid)
+                .Include(t => t.User)
+                .Include(t => t.Seat).ThenInclude(s => s.Room).ThenInclude(r => r.Theater)
+                .Include(t => t.Showtime).ThenInclude(s => s.Movie)
+                .ToListAsync();
+
+            if (tickets.Any() && !string.IsNullOrEmpty(tickets.First().User?.Email))
+            {
+                var htmlContent = BookingHelper.BuildTicketEmailHtml(orderId, tickets);
+                try
+                {
+                    await _email.SendTicketEmailAsync(tickets.First().User.Email, "Xác nhận đặt vé xem phim", htmlContent, orderId);
+                }
+                catch (Exception ex)
+                {
+                    _log.LogError(ex, "Send email failed for OrderId {OrderId}", orderId);
+                }
+            }
+
+            return RedirectToAction("PaymentSuccess", new { orderId });
         }
-        var tickets = await _context.Tickets.AsNoTracking()
-            .Where(t => t.OrderId == orderId && t.IsPaid)
-            .Include(t => t.User)
-            .Include(t => t.Seat).ThenInclude(s => s.Room).ThenInclude(r => r.Theater)
-            .Include(t => t.Showtime).ThenInclude(s => s.Movie)
-            .ToListAsync();
-        if (!tickets.Any() || string.IsNullOrEmpty(tickets.First().User?.Email)) return Ok();
-        var htmlContent = BookingHelper.BuildTicketEmailHtml(orderId, tickets);
-        try { await _email.SendTicketEmailAsync(tickets.First().User.Email, "Xác nhận đặt vé xem phim", htmlContent, orderId); }
-        catch (Exception ex) { _log.LogError(ex, "Send email failed for OrderId {OrderId}", orderId); }
-        return Ok();
-    }
 
-    [AllowAnonymous]
-    public async Task<IActionResult> PaymentSuccess(string orderId)
-    {
-        if (string.IsNullOrEmpty(orderId)) return RedirectToAction("Index", "Movies");
-        var tickets = await _context.Tickets.AsNoTracking()
-            .Include(t => t.User)
-            .Include(t => t.Seat).ThenInclude(s => s.Room).ThenInclude(r => r.Theater)
-            .Include(t => t.Showtime).ThenInclude(s => s.Movie)
-            .Where(t => t.OrderId == orderId)
-            .ToListAsync();
-        if (!tickets.Any()) return RedirectToAction("Index", "Movies");
-        if (tickets.Any(t => !t.IsPaid)) return View("PaymentPending", orderId);
-        return View(new PaymentSuccessViewModel { Tickets = tickets, QrCodeBase64 = BookingHelper.GenerateQrCodeBase64($"OrderId={orderId}") });
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetPaidSeats(int showtimeId)
-    {
-        var paid = await _context.Tickets.AsNoTracking()
-            .Where(t => t.ShowtimeId == showtimeId && t.IsPaid)
-            .Select(t => new { t.SeatId, t.PaymentMethod })
-            .ToListAsync();
-        return Json(new { paidSeats = paid });
-    }
-
-    [Authorize(Roles = "Employee")]
-    [HttpPost]
-    public async Task<IActionResult> CashPayment([FromBody] CashPaymentRequest req)
-    {
-        if (string.IsNullOrEmpty(req.OrderId)) return Json(new { success = false, error = "OrderId không hợp lệ" });
-        var tickets = await _context.Tickets.Where(t => t.OrderId == req.OrderId && !t.IsPaid).Include(t => t.Seat).ToListAsync();
-        var paidAt = DateTime.UtcNow;
-        foreach (var t in tickets)
+        [AllowAnonymous]
+        [HttpPost("/api/momo/notify")]
+        public async Task<IActionResult> MomoNotifyUrl()
         {
-            t.IsPaid = true;
-            t.PaymentMethod = "Cash";
-            t.BookingTime = paidAt;
-            if (t.Seat != null) t.Seat.IsBooked = true;
+            using var reader = new StreamReader(Request.Body); var body = await reader.ReadToEndAsync();
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(body);
+            if (data == null || !data.ContainsKey("orderId")) return BadRequest();
+            var orderId = data["orderId"];
+            var result = _momo.ProcessNotify(data);
+            if (result.IsSuccess)
+            {
+                var ticketsToPay = await _context.Tickets.Where(t => t.OrderId == orderId && !t.IsPaid).Include(t => t.Seat).ToListAsync();
+                var paidAt = DateTime.UtcNow;
+                foreach (var t in ticketsToPay)
+                {
+                    t.IsPaid = true;
+                    t.PaymentMethod = "Momo";
+                    t.BookingTime = paidAt;
+                    if (t.Seat != null) t.Seat.IsBooked = true;
+                }
+                await _context.SaveChangesAsync();
+            }
+            var tickets = await _context.Tickets.AsNoTracking()
+                .Where(t => t.OrderId == orderId && t.IsPaid)
+                .Include(t => t.User)
+                .Include(t => t.Seat).ThenInclude(s => s.Room).ThenInclude(r => r.Theater)
+                .Include(t => t.Showtime).ThenInclude(s => s.Movie)
+                .ToListAsync();
+            if (!tickets.Any() || string.IsNullOrEmpty(tickets.First().User?.Email)) return Ok();
+            var htmlContent = BookingHelper.BuildTicketEmailHtml(orderId, tickets);
+            try { await _email.SendTicketEmailAsync(tickets.First().User.Email, "Xác nhận đặt vé xem phim", htmlContent, orderId); }
+            catch (Exception ex) { _log.LogError(ex, "Send email failed for OrderId {OrderId}", orderId); }
+            return Ok();
         }
-        await _context.SaveChangesAsync();
-        return Json(new { success = true });
+
+        [AllowAnonymous]
+        public async Task<IActionResult> PaymentSuccess(string orderId)
+        {
+            if (string.IsNullOrEmpty(orderId)) return RedirectToAction("Index", "Movies");
+            var tickets = await _context.Tickets.AsNoTracking()
+                .Include(t => t.User)
+                .Include(t => t.Seat).ThenInclude(s => s.Room).ThenInclude(r => r.Theater)
+                .Include(t => t.Showtime).ThenInclude(s => s.Movie)
+                .Where(t => t.OrderId == orderId)
+                .ToListAsync();
+            if (!tickets.Any()) return RedirectToAction("Index", "Movies");
+            if (tickets.Any(t => !t.IsPaid)) return View("PaymentPending", orderId);
+            return View(new PaymentSuccessViewModel { OrderId = orderId, TotalAmount = (long)tickets.Sum(t => t.Price) });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPaidSeats(int showtimeId)
+        {
+            var paid = await _context.Tickets.AsNoTracking()
+                .Where(t => t.ShowtimeId == showtimeId && t.IsPaid)
+                .Select(t => new { t.SeatId, t.PaymentMethod })
+                .ToListAsync();
+            return Json(new { paidSeats = paid });
+        }
+
+        [Authorize(Roles = "Employee")]
+        [HttpPost]
+        public async Task<IActionResult> CashPayment([FromBody] CashPaymentRequest req)
+        {
+            if (string.IsNullOrEmpty(req.OrderId)) return Json(new { success = false, error = "OrderId không hợp lệ" });
+            var tickets = await _context.Tickets.Where(t => t.OrderId == req.OrderId && !t.IsPaid).Include(t => t.Seat).ToListAsync();
+            var paidAt = DateTime.UtcNow;
+            foreach (var t in tickets)
+            {
+                t.IsPaid = true;
+                t.PaymentMethod = "Cash";
+                t.BookingTime = paidAt;
+                if (t.Seat != null) t.Seat.IsBooked = true;
+            }
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
     }
-}
 }
