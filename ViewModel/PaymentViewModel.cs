@@ -6,5 +6,6 @@ namespace CinemaManagement.ViewModel
         public decimal TicketTotal { get; set; }
         public decimal ComboTotal { get; set; }
         public decimal GrandTotal { get; set; }
+        public string PaymentMethod { get; set; }
     }
 }
