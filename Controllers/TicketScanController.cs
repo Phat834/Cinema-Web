@@ -24,6 +24,7 @@ namespace CinemaManagement.Controllers
         // Xử lý sau khi quét
         public IActionResult Check(string orderId)
         {
+            orderId = NormalizeOrderId(orderId);
             if (string.IsNullOrEmpty(orderId))
             {
                 ViewBag.Error = "OrderId không hợp lệ";
@@ -70,6 +71,7 @@ namespace CinemaManagement.Controllers
         [HttpPost]
         public IActionResult AjaxCheck([FromBody] string orderId)
         {
+            orderId = NormalizeOrderId(orderId);
             if (string.IsNullOrEmpty(orderId))
                 return Json(new { success = false, message = "OrderId không hợp lệ" });
 
@@ -109,6 +111,18 @@ namespace CinemaManagement.Controllers
                     payment = t.PaymentMethod
                 })
             });
+        }
+
+        private static string NormalizeOrderId(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            const string prefix = "orderid=";
+            var trimmed = input.Trim();
+            if (trimmed.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return trimmed.Substring(prefix.Length);
+            }
+            return trimmed;
         }
 
     }
