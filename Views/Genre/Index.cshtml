@@ -5,43 +5,47 @@
 
 <!-- CSS tùy chỉnh phong cách cinema -->
 <style>
-    body {
-        background-color: #f8f9fa;
-    }
-
     .btn-add-genre {
-        background-color: #c82333; /* đỏ đậm */
-        color: white;
+        background-color: var(--action-primary);
+        color: var(--text-on-brand);
         border: none;
-        border-radius: 6px;
-        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        padding: var(--space-2) var(--space-4);
         font-weight: 500;
-        transition: background-color 0.3s ease;
+        transition: background-color var(--duration-1) var(--ease-standard);
     }
 
         .btn-add-genre:hover {
-            background-color: black;
-            color: white;
+            background-color: var(--action-primary-hover);
+            color: var(--text-on-brand);
         }
 
     .table-cinema th {
-        background-color: #343a40;
-        color: white;
+        background-color: var(--surface-hover);
+        color: var(--text-primary);
         text-align: center;
     }
 
     .table-cinema td {
         vertical-align: middle;
         text-align: center;
+        background-color: var(--surface-elevated);
+        color: var(--text-primary);
+    }
+
+    .table-cinema {
+        background-color: var(--surface-elevated) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--color-border-0) !important;
     }
 
     .btn-primary {
-        background-color: #007bff;
+        background-color: var(--action-primary);
         border: none;
     }
 
     .btn-danger {
-        background-color: #dc3545;
+        background-color: var(--state-error);
         border: none;
     }
 
@@ -50,12 +54,31 @@
         }
 
     .modal-header {
-        background-color: #8B0000;
-        color: white;
+        background-color: var(--surface-hover);
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--color-border-0);
+    }
+
+    .modal-content {
+        background-color: var(--surface-elevated);
+        border: 1px solid var(--color-border-0);
+        color: var(--text-primary);
+    }
+
+    .modal-body {
+        color: var(--text-primary);
     }
 
     .modal-footer button {
         min-width: 90px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--color-border-0);
+    }
+
+    .btn-close {
+        filter: invert(1);
     }
 </style>
 

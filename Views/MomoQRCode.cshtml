@@ -1,0 +1,89 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
+@{
+    ViewData["Title"] = "Thanh toán MoMo";
+    var orderId = ViewBag.OrderId as string ?? "";
+    var amount = ViewBag.Amount as long? ?? 0;
+    var qrUrl = ViewBag.QrUrl as string ?? "";
+    var reservationTimeout = ViewBag.ReservationTimeout as int? ?? 10;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card bg-dark text-light border-0 shadow-lg">
+                <div class="card-body text-center p-5">
+                    <h4 class="mb-4"><i class="fas fa-qrcode me-2"></i>Quét mã QR MoMo</h4>
+
+                    <div class="mb-4">
+                        <img src="@qrUrl" alt="Mã QR MoMo" class="img-fluid rounded shadow" style="max-width: 280px; max-height: 280px;" />
+                    </div>
+
+                    <div class="mb-4 p-4 bg-secondary rounded">
+                        <p class="mb-2 text-muted">Số tiền cần thanh toán</p>
+                        <h2 class="text-warning fw-bold mb-0">@amount.ToString("#,##0") VND</h2>
+                    </div>
+
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Mở ứng dụng MoMo, chọn "Quét mã QR" và quét mã trên để thanh toán.
+                    </div>
+
+                    <div class="mb-4 p-3 bg-dark rounded border border-secondary">
+                        <p class="mb-1"><strong>Thời gian còn lại:</strong> <span id="countdownTimer" class="text-danger fw-bold fs-5">@reservationTimeout:00</span></p>
+                        <p class="mb-0 text-muted small">Mã đơn: <span class="text-warning">@orderId</span></p>
+                    </div>
+
+                    @if (Environment.IsDevelopment())
+                    {
+                        <form method="get" action="/Booking/MockMomoCheckout" class="mb-3">
+                            <input type="hidden" name="orderId" value="@orderId" />
+                            <input type="hidden" name="amount" value="@amount" />
+                            <button type="submit" class="btn btn-warning w-100 fw-bold py-3">
+                                <i class="fas fa-flask me-2"></i>Xác nhận đã quét mã (MoMo Sandbox Demo)
+                            </button>
+                        </form>
+                        <p class="text-muted small">Chỉ hiển thị trong môi trường Development - Giả lập thanh toán thành công ngay lập tức</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: #111;
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+    }
+    .container {
+        flex: 1;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let seconds = @reservationTimeout * 60;
+        const timerEl = document.getElementById('countdownTimer');
+
+        const countdownInterval = setInterval(() => {
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                timerEl.textContent = '00:00';
+                timerEl.classList.remove('text-danger');
+                timerEl.classList.add('text-muted');
+                return;
+            }
+            seconds--;
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            timerEl.textContent = `${mins}:${secs}`;
+            if (seconds < 60) {
+                timerEl.classList.add('text-danger', 'fw-bold');
+            }
+        }, 1000);
+
+        window.addEventListener('beforeunload', () => clearInterval(countdownInterval));
+    </script>
+}

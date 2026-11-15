@@ -23,7 +23,7 @@
                 @Model.Title
             </h1>
             <div style="font-size:1.3rem; color:#ffc107;">
-                ? @Model.Rating / 10
+                ⭐ @Model.Rating / 10
             </div>
         </div>
     </div>
@@ -47,18 +47,18 @@
 
                 <h4 class="text-uppercase fw-bold mb-3"
                     style="color:#e50914;">
-                    N?i dung phim
+                    Nội dung phim
                 </h4>
 
                 <p class="fs-5 text-light">@Model.Description</p>
 
                 <div class="row mt-4 text-light fs-5">
-                    <div class="col-md-6 mb-2">? @Model.Duration ph�t</div>
+                    <div class="col-md-6 mb-2">⏱️ @Model.Duration phút</div>
                     <div class="col-md-6 mb-2">
-                        ?? @Model.ReleaseDate.ToString("dd/MM/yyyy")
+                        📅 @Model.ReleaseDate.ToString("dd/MM/yyyy")
                     </div>
                     <div class="col-12">
-                        ?? @string.Join(", ", Model.MovieGenres.Select(g => g.Genre.Name))
+                        🎭 @string.Join(", ", Model.MovieGenres.Select(g => g.Genre.Name))
                     </div>
                 </div>
             </div>
@@ -82,13 +82,13 @@
         <div class="col-12 d-flex gap-3 mt-5">
             <a asp-action="Edit" asp-route-id="@Model.MovieId"
                class="btn btn-danger btn-lg px-5 rounded-pill">
-                ?? Ch?nh s?a
+                Chỉnh sửa
             </a>
 
-            <a asp-action="Index"
+<a asp-action="Index"
                class="btn btn-dark btn-lg px-5 rounded-pill">
-                ? Danh s�ch phim
-            </a>
+               ⬅ Danh sách phim
+           </a>
         </div>
 
     </div>

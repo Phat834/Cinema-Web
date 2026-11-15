@@ -1,4 +1,4 @@
-@model IEnumerable<CinemaManagement.Models.Showtime>
+﻿@model IEnumerable<CinemaManagement.Models.Showtime>
 @{
     ViewData["Title"] = "Danh sách suất chiếu";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -13,58 +13,43 @@
 
 <style>
     .custom-card {
-        background-color: #1c1c1c;
-        color: #fff;
+        background-color: var(--surface-elevated);
+        color: var(--text-primary);
         border-radius: 10px;
-        box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.15);
         padding: 20px;
+        border: 1px solid var(--color-border-0);
     }
 
     .custom-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #000;
+        background-color: var(--surface-overlay);
         padding: 15px 20px;
         border-radius: 10px 10px 0 0;
         margin-bottom: 20px;
+        border: 1px solid var(--color-border-0);
     }
 
-        .custom-header h3 {
-            color: #ff4d4d;
-            margin: 0;
-        }
-
-    .btn-red {
-        background-color: #ff4d4d;
-        color: #fff;
-        border: none;
+    .custom-header h3 {
+        color: #ff4d4d;
+        margin: 0;
     }
-
-        .btn-red:hover {
-            background-color: #e60000;
-        }
 
     .table-dark-custom th, .table-dark-custom td {
-        background-color: #2c2c2c;
-        color: #fff;
-        border-color: #444;
+        background-color: var(--surface-elevated) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--color-border-0) !important;
+    }
+    .table-dark-custom tbody tr:hover th,
+    .table-dark-custom tbody tr:hover td {
+        background-color: var(--surface-hover) !important;
+        color: var(--text-primary) !important;
     }
 
-    .text-danger {
-        color: #ff6666 !important;
-    }
-
-    .city-scroller .city-item {
-        min-width: 90px;
-        margin-right: 8px;
-    }
-
-    .city-item.active {
-        background: #ff4d4d;
-        color: #fff;
-        border-color: #ff4d4d;
-    }
+    .city-scroller .city-item { min-width: 90px; margin-right: 8px; }
+    .city-item.active { background: #ff4d4d; color: #fff; border-color: #ff4d4d; }
 </style>
 
 <div class="custom-card">
@@ -86,7 +71,7 @@
         }
     </div>
 
-    <div id="showtimeTableContainer">
+    <div id="showtimeTableContainer" class="table-responsive">
         <table class="table table-dark table-dark-custom table-bordered align-middle">
             <thead>
                 <tr>
@@ -112,14 +97,12 @@
                         <td>@item.Price.ToString("#,##0") VND</td>
                         <td>@item.DiscountPercent</td>
                         <td>
-                            <a asp-action="Edit" asp-route-id="@item.ShowtimeId" class="btn btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i>
+                            <a asp-action="Edit" asp-route-id="@item.ShowtimeId" class="btn btn-sm btn-warning text-dark">
+                                <i class="bi bi-pencil"></i> Sửa
                             </a>
-
                             <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(@item.ShowtimeId)">
-                                <i class="bi bi-trash"></i>
+                                <i class="bi bi-trash"></i> Xóa
                             </button>
-
                             <form id="deleteForm-@item.ShowtimeId" asp-action="Delete" asp-route-id="@item.ShowtimeId" method="post" style="display:none;">
                                 @Html.AntiForgeryToken()
                             </form>

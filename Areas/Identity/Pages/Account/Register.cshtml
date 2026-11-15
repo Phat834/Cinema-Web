@@ -1,23 +1,23 @@
 ﻿@page
 @model CinemaManagement.Areas.Identity.Pages.Account.RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Đăng ký";
 }
 
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-lg-6">
-            <div class="card shadow-lg border-0 rounded">
-                <div class="card-header text-center text-white" style="background: linear-gradient(to right, #87CEEB, #4682B4);">
-                    <h1>Create Your Account</h1>
+            <div class="card shadow-lg border-0 rounded" style="background: var(--surface-elevated); border: 1px solid var(--color-border-0);">
+                <div class="card-header text-center text-white" style="background: linear-gradient(135deg, var(--action-primary), var(--action-primary-hover));">
+                    <h1>Tạo tài khoản</h1>
                 </div>
                 <div class="card-body">
                     <form id="registerForm" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.FullName" class="form-control" autocomplete="fullname" placeholder="Full Name" />
-                            <label asp-for="Input.FullName"><i class="bi bi-person"></i> Full Name</label>
+                            <input asp-for="Input.FullName" class="form-control" autocomplete="fullname" placeholder="Họ và tên" />
+                            <label asp-for="Input.FullName"><i class="bi bi-person"></i> Họ và tên</label>
                             <span asp-validation-for="Input.FullName" class="text-danger"></span>
                         </div>
 
@@ -28,34 +28,34 @@
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Password" type="password" class="form-control" autocomplete="new-password" placeholder="password" />
-                            <label asp-for="Input.Password"><i class="bi bi-lock"></i> Password</label>
+                            <input asp-for="Input.Password" type="password" class="form-control" autocomplete="new-password" placeholder="Mật khẩu" />
+                            <label asp-for="Input.Password"><i class="bi bi-lock"></i> Mật khẩu</label>
                             <span asp-validation-for="Input.Password" class="text-danger"></span>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.ConfirmPassword" type="password" class="form-control" autocomplete="new-password" placeholder="Confirm Password" />
-                            <label asp-for="Input.ConfirmPassword"><i class="bi bi-check-circle"></i> Confirm Password</label>
+                            <input asp-for="Input.ConfirmPassword" type="password" class="form-control" autocomplete="new-password" placeholder="Xác nhận mật khẩu" />
+                            <label asp-for="Input.ConfirmPassword"><i class="bi bi-check-circle"></i> Xác nhận mật khẩu</label>
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                         </div>
 
                         <!-- Chọn Role -->
                         <div class="form-floating mb-3">
                             <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-control">
-                                <option disabled selected>Select Role</option>
+                                <option disabled selected>Chọn vai trò</option>
                             </select>
-                            <label for="Input.Role"><i class="bi bi-person-badge"></i> Select Role</label>
+                            <label for="Input.Role"><i class="bi bi-person-badge"></i> Vai trò</label>
                         </div>
 
-                        <button id="registerSubmit" type="submit" class="w-100 btn btn-lg text-white" style="background: linear-gradient(to right, #00c6ff, #0072ff); border-radius: 25px;">
-                            <i class="bi bi-person-plus"></i> Register
+                        <button id="registerSubmit" type="submit" class="w-100 btn btn-lg text-white" style="background: linear-gradient(135deg, var(--action-primary), var(--action-primary-hover)); border-radius: var(--radius-full);">
+                            <i class="bi bi-person-plus"></i> Đăng ký
                         </button>
                     </form>
                 </div>
             </div>
 
             <div class="text-center mt-3">
-                <p>Already have an account? <a href="/Identity/Account/Login" class="text-primary">Login here</a></p>
+                <p>Đã có tài khoản? <a href="/Identity/Account/Login" class="text-primary">Đăng nhập ngay</a></p>
             </div>
         </div>
     </div>
@@ -64,19 +64,19 @@
 <!-- Admin Secret Modal -->
 <div class="modal fade" id="adminSecretModal" tabindex="-1" aria-labelledby="adminSecretModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Enter Admin Secret Code</h5>
+        <div class="modal-content" style="background: var(--surface-elevated); border: 1px solid var(--color-border-0); color: var(--text-primary);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--color-border-0);">
+                <h5 class="modal-title">Nhập mã bí mật Admin</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="adminSecretInput">Secret Code</label>
+                    <label for="adminSecretInput">Mã bí mật</label>
                     <input type="password" class="form-control" id="adminSecretInput" name="AdminSecret" />
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="submitRegister">Submit</button>
+            <div class="modal-footer" style="border-top: 1px solid var(--color-border-0);">
+                <button type="button" class="btn btn-primary" id="submitRegister">Xác nhận</button>
             </div>
         </div>
     </div>

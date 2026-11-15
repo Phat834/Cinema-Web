@@ -143,12 +143,12 @@
                     <div>Mô tả: <span>@room.Description</span></div>
                     <div>Số ghế: <strong>@(room.Seats?.Count ?? 0)</strong></div>
                     <div class="room-actions">
-                        <a asp-action="EditRoom"
+<a asp-action="EditRoom"
                            asp-controller="ManageSeat"
                            asp-route-id="@room.RoomId"
                            class="btn-edit-room">
-                           Edit Room
-                        </a>
+                           Chỉnh sửa phòng
+                       </a>
 
                         @if (room.IsActive)
                         {
